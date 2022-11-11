@@ -191,20 +191,80 @@ public class DynamicMP {
   // creates a new layer
   private void constructLayer() {
 
+    // get the last layer
+    TreeMap<Integer, Integer> currentLayer = this.layers.getLast();
+
     // place the points contained in the unsampled layer in an array
-    Integer[] points = this.layers.getLast().keySet().toArray(new Integer[0]);
+    Integer[] points = currentLayer.keySet().toArray(new Integer[0]);
 
     int n = points.length;
     Random rng = new Random();
 
-    // sample points as new centers from this set
+    // sample points as centers from this set
     TreeMap<Integer, Integer> layerSamples = new TreeMap<Integer, Integer>();
 
-    for (int i = 0; i < this.sampleSize; ) {
-
+    for (int i = 0; i < this.sampleSize; i++) {
+      Integer sample = points[rng.nextInt(n)];
+      layerSamples.put(sample, sample);
     }
 
+    // place sampled points in array
+    Integer[] layerSamplesArr = layerSamples.keySet().toArray(new Integer[0]);
 
+    int m = layerSamplesArr.length;
+
+    // find distance from each point in the set from the sampled points
+    float[] dist = new float[n];
+
+    // find an assignment of the points to the centers
+    int[] assignment = new int[n];
+
+    for (int i = 0; i < n; i++) {
+
+      dist[i] = this.metric.d(this.space.get(points[i]), this.space.get(layerSamplesArr[0]));
+      assignment[i] = 0;
+      for (int j = 1; j < m; j++) {
+        float x = this.metric.d(this.space.get(points[i]), this.space.get(layerSamplesArr[j]));
+        if (x < dist[i]) {
+          dist[i] = x;
+          assignment[i] = j;
+        }
+      }
+    }
+
+    // compute the value nu
+    Arrays.sort(dist);
+    float nu = dist[(int)Math.floor(n*this.beta)]; // USE LINEAR SEARCH FOR O(log n) SPEEDUP!!
+
+    // compute the clustering at this layer and create new layer of unclustered points
+    @SuppressWarnings("unchecked")
+    TreeMap<Integer, Integer>[] layerClustering = new TreeMap[m];
+
+    TreeMap<Integer, Integer> newLayer = new TreeMap<Integer, Integer>();
+
+    for (int i = 0; i < m; i++) {
+      layerClustering[i] = new TreeMap<Integer, Integer>();
+    }
+
+    for (int i = 0; i < n; i++) {
+      if (dist[i] <= nu) {
+        layerClustering[assignment[i]].put(points[i], points[i]);
+        currentLayer.put(points[i], assignment[i]);
+      }
+      else {
+        currentLayer.put(points[i], -1);
+        newLayer.put(points[i], -1);
+      }
+    }
+
+    // update the data structures
+    this.layers.add(newLayer);
+
+    this.samples.add(layerSamples);
+
+    this.clusters.add(layerClustering);
+
+    this.reconTimer.add((int)(n*this.tau));
   }
 
   // returns the number of layers in the data structure
