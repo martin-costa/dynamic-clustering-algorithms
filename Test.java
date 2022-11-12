@@ -7,48 +7,37 @@ public class Test {
 
   public static void main(String[] args) throws IOException {
 
-    DynamicMP coreset = new DynamicMP(10, new LpNorm(1), 2f, 0.5f, 0.01f);
+    DynamicMP coreset = new DynamicMP(7, new LpNorm(1), 1.0f, 0.5f, 0.1f);
+
+    // 'census' input path
+    String census = "../data/census_data";
 
     // 'song' input path
-    String path = "../data/kddcup";
+    String song = "../data/song";
 
-    Scanner scanner = new Scanner(new File(path));
+    // 'kddcup' input path
+    String kddcup = "../data/kddcup";
 
-    int n = scanner.nextInt();
-    int size = scanner.nextInt();
+    // create un update stream of length n
+    int n = 4000;
+    int windowLength = 4000;
 
-    float[] feature = new float[size];
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, song);
 
-    for (int i = 0; i < size; i++) {
-      feature[i] = scanner.nextFloat();
+    // run the coreset on this update stream
+    for (int i = 0; i < updateStream.streamLength(); i++) {
+
+      System.out.println(coreset.depth());
+
+      // if we have an insertion
+      if (updateStream.updateType(i)) {
+        coreset.insert(updateStream.key(i), updateStream.point(i));
+      }
+
+      // if we have a deletion
+      else {
+        coreset.delete(updateStream.key(i));
+      }
     }
-
-    System.out.println(n);
-    System.out.println(size);
-
-    System.out.println(Arrays.toString(feature));
-    System.out.println(feature[25]);
-
-
-
-    // int count = (stream.read() << 24) | (stream.read() << 16) | (stream.read() << 8) | (stream.read());
-    //
-    // System.out.println(count);
-    //
-    //
-    // byte[] b = new byte[4];
-    // stream.read(b);
-    //
-    // System.out.println(ByteBuffer.wrap(b).getInt());
-    //
-    //
-    // String line = scanner.nextLine();
-    //
-    // for (int i = 0; i < 10; i++) {
-    //   System.out.println(scanner.nextLine());
-    // }
-
   }
-
-
 }

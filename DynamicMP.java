@@ -98,6 +98,9 @@ public class DynamicMP {
     // insert point into unsampled layer
     layerIterator.next().put(key, key);
 
+    // check if we need to construct a new layer
+    this.reconstructFromLayer(this.depth() - 1);
+
     this.checkForReconstruction();
   }
 
@@ -141,8 +144,10 @@ public class DynamicMP {
           layerSamples.remove(key);
 
           // replace sampled point with an arbitrary point in the cluster
-          Integer newCenter = cluster.firstKey();
-          if (newCenter != null) layerSamples.put(newCenter, newCenter);
+          if (!cluster.isEmpty()) {
+            Integer newCenter = cluster.firstKey();
+            layerSamples.put(newCenter, newCenter);
+          }
         }
 
         // check if data structure needs to be reconstructed
@@ -234,7 +239,7 @@ public class DynamicMP {
 
     // compute the value nu
     Arrays.sort(dist);
-    float nu = dist[(int)Math.floor(n*this.beta)]; // USE LINEAR SEARCH FOR O(log n) SPEEDUP!!
+    float nu = dist[(int)Math.ceil(n*this.beta)]; // USE LINEAR SEARCH FOR O(log n) SPEEDUP!!
 
     // compute the clustering at this layer and create new layer of unclustered points
     @SuppressWarnings("unchecked")
