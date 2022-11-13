@@ -89,14 +89,14 @@ public class DynamicMP {
     for (int i = 0; i < this.depth()-1; i++) {
 
       // insert point into layer
-      layerIterator.next().put(key, key);
+      layerIterator.next().put(key, -1);
 
       // decrement reconstruction timer for this layer
       reconIterator.set(reconIterator.next()-1);
     }
 
     // insert point into unsampled layer
-    layerIterator.next().put(key, key);
+    layerIterator.next().put(key, -1);
 
     // check if we need to construct a new layer
     this.reconstructFromLayer(this.depth() - 1);
@@ -146,7 +146,7 @@ public class DynamicMP {
           // replace sampled point with an arbitrary point in the cluster
           if (!cluster.isEmpty()) {
             Integer newCenter = cluster.firstKey();
-            layerSamples.put(newCenter, newCenter);
+            layerSamples.put(newCenter, cluster.size());
           }
         }
 
@@ -224,6 +224,9 @@ public class DynamicMP {
     // find an assignment of the points to the centers
     int[] assignment = new int[n];
 
+    // find how many points are assigned to each cluster center
+    int[] weights = new int[m];
+
     for (int i = 0; i < n; i++) {
 
       dist[i] = this.metric.d(this.space.get(points[i]), this.space.get(layerSamplesArr[0]));
@@ -235,6 +238,12 @@ public class DynamicMP {
           assignment[i] = j;
         }
       }
+      weights[assignment[i]]++;
+    }
+
+    // set weights
+    for (int i = 0; i < m; i++) {
+      layerSamples.put(layerSamplesArr[i], weights[i]);
     }
 
     // compute the value nu
@@ -269,7 +278,7 @@ public class DynamicMP {
 
     this.clusters.add(layerClustering);
 
-    this.reconTimer.add((int)(n*this.tau));
+    this.reconTimer.add((int)Math.ceil(n*this.tau));
   }
 
   // returns the number of layers in the data structure
@@ -277,4 +286,23 @@ public class DynamicMP {
     return this.layers.size();
   }
 
+  ////____//// METHODS FOR TESTING ////____////
+
+  public void printStats() {
+
+    // print times until reconstruction
+    System.out.println(this.reconTimer);
+
+    // print sizes of layers
+    int j = 0;
+    LinkedList<Integer> sizes = new LinkedList<Integer>();
+    for (int i = 0; i < depth(); i++) {
+      sizes.add(layers.get(i).size());
+    }
+    System.out.println(sizes);
+
+    // print number of points in the space
+    System.out.println(this.space.size());
+    System.out.println("");
+  }
 }
