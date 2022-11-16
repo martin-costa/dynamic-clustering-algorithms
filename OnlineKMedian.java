@@ -31,6 +31,9 @@ public class OnlineKMedian {
   // the number of points in the space
   private int n;
 
+  // the cost of the clustering found
+  private float clusteringCost;
+
   // auxiliary data structures used for solving the problem
 
   // an array of the keys corresponding to the points in the input
@@ -110,22 +113,99 @@ public class OnlineKMedian {
   }
 
   // implementation of online k-median algorithm
-  public TreeMap<Integer, Integer> cluster() {
+  private TreeMap<Integer, Integer> cluster() {
+
+    // if we can take everything as a median
+    if (n <= k) {
+      clusteringCost = 0;
+      return null;
+    }
 
     // implementation of online k-median algorithm
     while (found < k) {
 
       // find the next median
-      findNextMedian();
+      int i = findNextMedian();
+
+      // next median is i
+      nonMedians.remove(i);
+      medians[found] = i;
+
       found++;
+
+      // update distances from medians
+      for (int j=0; j < n; j++) {
+        distFromMedians[j] = Math.min(distFromMedians[j], metric.d(pointsArr[j], pointsArr[i]))*weightsArr[j];
+      }
     }
 
-    return null;
+    // create a BBT to return solution
+    TreeMap<Integer, Integer> solution = new TreeMap<Integer, Integer>();
+
+    for (int j=0; j < k; j++) {
+      solution.put(keysArr[medians[j]], keysArr[medians[j]]);
+    }
+
+    // compute the cost of the clustering
+    clusteringCost = 0;
+    for (int j = 0; j < n; j++) {
+      clusteringCost += distFromMedians[j];
+    }
+
+    return solution;
   }
 
   // find the next median
-  private void findNextMedian() {
+  private int findNextMedian() {
 
+    // get the max value ball from isolated
+    Pair ball = maxValueIsolated();
+
+    int i = ball.l;
+    float r = ball.r;
+
+    // find the index of the last point that is within beta*r of i
+    int j = Arrays.binarySearch(sortedPointsDistArr[i], beta*r);
+    if (j < 0) j = -j-2;
+
+    // while we have more than one child (j > 0) find a max value child
+    while (j > 0) {
+
+      // find the max value child of (i, r)
+      ball = maxValueChild(i, r, j);
+
+      i = ball.l;
+      r = ball.r;
+
+      // find the index of the last point that is within beta*r of i
+      j = Arrays.binarySearch(sortedPointsDistArr[i], beta*r);
+      if (j < 0) j = -j-2;
+    }
+
+    // next median is i
+    return i;
+  }
+
+  // find the max value child of this ball
+  private Pair maxValueChild(int i, float r, int l) {
+
+    // keep track of ball of best value
+    Pair ball = new Pair(-1, 0.0f);
+
+    // the value of ball
+    float bestValue = 0;
+
+    for (int j = 0; j <= l; j++) {
+
+      float value = ballValue(sortedPointsArr[i][j], r/alpha);
+
+      if (value >= bestValue) {
+        bestValue = value;
+        ball = new Pair(sortedPointsArr[i][j], r/alpha);
+      }
+    }
+
+    return ball;
   }
 
   // return the max value of isolated(x, medians) for some x not in medians
@@ -168,11 +248,12 @@ public class OnlineKMedian {
     // find the furthest point from point i that is not more than r away
     int j = Arrays.binarySearch(sortedPointsDistArr[i], r);
 
-    if (i < 0) i = -i-2;
+    if (j < 0) j = -j-2;
 
     return r*ballValueAux1[i][j] - ballValueAux2[i][j];
   }
 
+  // set up the data structures needed to solve the problem efficiently
   private void setUpDataStructures() {
 
     // end if the input is empty
@@ -197,6 +278,7 @@ public class OnlineKMedian {
 
     // initialise array to store medians
     medians = new int[k];
+    found = 0;
 
     // initialise PriorityQueue for searching non median points
     nonMedians = new PriorityQueue<Integer>();
@@ -248,4 +330,8 @@ public class OnlineKMedian {
     // System.out.println(Arrays.deepToString(sortedPointsDistArr));
   }
 
+  // returns the cost of the clustering
+  public float cost() {
+    return clusteringCost;
+  }
 }

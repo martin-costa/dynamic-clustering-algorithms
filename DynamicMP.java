@@ -20,7 +20,7 @@ public class DynamicMP {
   private LinkedList<TreeMap<Integer, Integer>> layers;
 
   // the sampled medians for each layer
-  private LinkedList<TreeMap<Integer, Integer>> samples;
+  private LinkedList<TreeMap<Integer, Float>> samples;
 
   // the clusters for each layer
   private LinkedList<TreeMap<Integer, Integer>[]> clusters;
@@ -286,11 +286,25 @@ public class DynamicMP {
     return this.layers.size();
   }
 
+  // clusters the coreset and returns the value of the clustering
+  public float cluster() {
+
+    TreeMap<Integer, Float> coresetWeights = new TreeMap<Integer, Float>();
+
+    // place the samples from each layer into the map
+    for (int i = 0; i < depth()-1; i++) {
+      coresetWeights.putAll(samples.get(i));
+    }
+
+    return 0;
+  }
+
   ////____//// METHODS FOR TESTING ////____////
 
   public void printStats() {
 
     // print times until reconstruction
+    System.out.print("Reconstruction timer: ");
     System.out.println(this.reconTimer);
 
     // print sizes of layers
@@ -299,9 +313,11 @@ public class DynamicMP {
     for (int i = 0; i < depth(); i++) {
       sizes.add(layers.get(i).size());
     }
+    System.out.print("Layer sizes:          ");
     System.out.println(sizes);
 
     // print number of points in the space
+    System.out.print("Size of metric space: ");
     System.out.println(this.space.size());
     System.out.println("");
   }

@@ -20,22 +20,16 @@ public class Test {
   // main function to run tests
   public static void main(String[] args) throws IOException, InterruptedException {
 
-    // test2();
-    //
-    // if (true) {
-    //   return;
-    // }
-
     // parameter k
     int k = 7;
 
     DynamicMP coreset = new DynamicMP(k, new LpNorm(1), 1.0f, 0.5f, 0.1f);
 
     // create un update stream of length n
-    int n = 10;
-    int windowLength = 5;
+    int n = 200;
+    int windowLength = 200;
 
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, song);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
 
     // create a static algorithm
     OnlineKMedian staticKMedian = new OnlineKMedian(k, new LpNorm(1));
@@ -47,7 +41,7 @@ public class Test {
     for (int i = 0; i < updateStream.streamLength(); i++) {
 
       // output metrics
-      coreset.printStats();
+      //coreset.printStats();
 
       // if we have an insertion
       if (updateStream.updateType(i)) {
@@ -62,28 +56,11 @@ public class Test {
       }
 
       staticKMedian.cluster(activePoints);
+
+      System.out.println(staticKMedian.cost());
     }
 
     // treemap time: 98957, 99489
     // hashmap time: 102460, 103128
-  }
-
-  public static void test2() {
-
-    float[] A = new float[4];
-
-    A[0] = 8;
-    A[1] = 10;
-    A[2] = 12;
-    A[3] = 91;
-
-    int i = Arrays.binarySearch(A, 0.0f);
-
-    if (i < 0) {
-      i = -i-2;
-    }
-
-    System.out.println(i);
-
   }
 }
