@@ -21,13 +21,13 @@ public class Test {
   public static void main(String[] args) throws IOException, InterruptedException {
 
     // parameter k
-    int k = 7;
+    int k = 20;
 
     DynamicMP coreset = new DynamicMP(k, new LpNorm(1), 1.0f, 0.5f, 0.1f);
 
     // create un update stream of length n
-    int n = 200;
-    int windowLength = 200;
+    int n = 2000;
+    int windowLength = 2000;
 
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
 
@@ -55,9 +55,23 @@ public class Test {
         activePoints.remove(updateStream.key(i));
       }
 
-      staticKMedian.cluster(activePoints);
+      if (i % 100 == 0) {
 
-      System.out.println(staticKMedian.cost());
+        staticKMedian.cluster(activePoints);
+
+        //System.out.println(staticKMedian.cost());
+
+        System.out.println(coreset.cluster() / staticKMedian.cost());
+
+        //System.out.println(coreset.cluster());
+
+        System.out.println(i);
+
+        System.out.println("");
+
+      }
+
+
     }
 
     // treemap time: 98957, 99489

@@ -64,7 +64,7 @@ public class DynamicMP {
 
     this.layers.add(new TreeMap<Integer, Integer>());
 
-    this.samples = new LinkedList<TreeMap<Integer, Integer>>();
+    this.samples = new LinkedList<TreeMap<Integer, Float>>();
 
     this.clusters = new LinkedList<TreeMap<Integer, Integer>[]>();
 
@@ -132,7 +132,7 @@ public class DynamicMP {
 
         // get the cluster and set of sampled points
         TreeMap<Integer, Integer> cluster = this.clusters.get(i)[clusterIndex];
-        TreeMap<Integer, Integer> layerSamples = this.samples.get(i);
+        TreeMap<Integer, Float> layerSamples = this.samples.get(i);
 
         // remove point from this cluster
         cluster.remove(key);
@@ -146,7 +146,7 @@ public class DynamicMP {
           // replace sampled point with an arbitrary point in the cluster
           if (!cluster.isEmpty()) {
             Integer newCenter = cluster.firstKey();
-            layerSamples.put(newCenter, cluster.size());
+            layerSamples.put(newCenter, (float)cluster.size());
           }
         }
 
@@ -206,11 +206,11 @@ public class DynamicMP {
     Random rng = new Random();
 
     // sample points as centers from this set
-    TreeMap<Integer, Integer> layerSamples = new TreeMap<Integer, Integer>();
+    TreeMap<Integer, Float> layerSamples = new TreeMap<Integer, Float>();
 
     for (int i = 0; i < this.sampleSize; i++) {
       Integer sample = points[rng.nextInt(n)];
-      layerSamples.put(sample, sample);
+      layerSamples.put(sample, 0.0f);
     }
 
     // place sampled points in array
@@ -243,7 +243,7 @@ public class DynamicMP {
 
     // set weights
     for (int i = 0; i < m; i++) {
-      layerSamples.put(layerSamplesArr[i], weights[i]);
+      layerSamples.put(layerSamplesArr[i], (float)weights[i]);
     }
 
     // compute the value nu
@@ -296,7 +296,50 @@ public class DynamicMP {
       coresetWeights.putAll(samples.get(i));
     }
 
-    return 0;
+    // create a map of the points
+    TreeMap<Integer, float[]> coresetPoints = new TreeMap<Integer, float[]>();
+
+    Integer[] coresetPointsArr = coresetWeights.keySet().toArray(new Integer[0]);
+
+    for (Integer key : coresetPointsArr) {
+      coresetPoints.put(key, space.get(key));
+    }
+
+    // call the static algorithm on the coreset
+    OnlineKMedian staticAlgo = new OnlineKMedian(k, metric);
+
+    TreeMap<Integer, Integer> solution = staticAlgo.cluster(coresetPoints, coresetWeights);
+
+    // OUTPUT TRUE COST
+
+    // if (solution == null) {
+    //   return 0;
+    // }
+    //
+    // Integer[] ab = space.keySet().toArray(new Integer[0]);
+    // Integer[] cb = solution.keySet().toArray(new Integer[0]);
+    //
+    // float c = 0;
+    //
+    // for (int i=0; i < ab.length; i++) {
+    //   float ccc = Float.POSITIVE_INFINITY;
+    //
+    //   for (int j=0; j < cb.length; j++) {
+    //
+    //     if (metric.d(space.get(ab[i]), space.get(cb[j])) < ccc) {
+    //       ccc = metric.d(space.get(ab[i]), space.get(cb[j]));
+    //     }
+    //
+    //   }
+    //
+    //   c += ccc;
+    // }
+
+
+    //return c;
+
+
+    return staticAlgo.cost();
   }
 
   ////____//// METHODS FOR TESTING ////____////

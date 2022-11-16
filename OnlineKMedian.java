@@ -180,6 +180,10 @@ public class OnlineKMedian {
       // find the index of the last point that is within beta*r of i
       j = Arrays.binarySearch(sortedPointsDistArr[i], beta*r);
       if (j < 0) j = -j-2;
+
+      // we might have duplicate ponts
+      if (r == 0.0f && j > 0)
+        j = 0;
     }
 
     // next median is i
