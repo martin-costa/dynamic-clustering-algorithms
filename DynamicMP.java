@@ -42,6 +42,7 @@ public class DynamicMP {
   // number of points taken as medians each layer
   private int sampleSize;
 
+  // constructer
   public DynamicMP(int k, Metric metric, float alpha, float beta, float epsilon) {
 
     // the metric
@@ -287,7 +288,7 @@ public class DynamicMP {
   }
 
   // clusters the coreset and returns the value of the clustering
-  public float cluster() {
+  public float cluster(boolean computeCost) {
 
     TreeMap<Integer, Float> coresetWeights = new TreeMap<Integer, Float>();
 
@@ -296,7 +297,14 @@ public class DynamicMP {
       coresetWeights.putAll(samples.get(i));
     }
 
-    // create a map of the points
+    // add final unsampled layer
+    Integer[] finalLayer = layers.getLast().keySet().toArray(new Integer[0]);
+
+    for (Integer key : finalLayer) {
+      coresetWeights.put(key, 1.0f);
+    }
+
+    // create a map of the actual points
     TreeMap<Integer, float[]> coresetPoints = new TreeMap<Integer, float[]>();
 
     Integer[] coresetPointsArr = coresetWeights.keySet().toArray(new Integer[0]);
@@ -310,36 +318,31 @@ public class DynamicMP {
 
     TreeMap<Integer, Integer> solution = staticAlgo.cluster(coresetPoints, coresetWeights);
 
-    // OUTPUT TRUE COST
+    // compute the cost of the solution if required
+    if (!computeCost) return -1;
 
-    // if (solution == null) {
-    //   return 0;
-    // }
-    //
-    // Integer[] ab = space.keySet().toArray(new Integer[0]);
-    // Integer[] cb = solution.keySet().toArray(new Integer[0]);
-    //
-    // float c = 0;
-    //
-    // for (int i=0; i < ab.length; i++) {
-    //   float ccc = Float.POSITIVE_INFINITY;
-    //
-    //   for (int j=0; j < cb.length; j++) {
-    //
-    //     if (metric.d(space.get(ab[i]), space.get(cb[j])) < ccc) {
-    //       ccc = metric.d(space.get(ab[i]), space.get(cb[j]));
-    //     }
-    //
-    //   }
-    //
-    //   c += ccc;
-    // }
+    Integer[] spaceArr = space.keySet().toArray(new Integer[0]);
+    Integer[] solutionArr = solution.keySet().toArray(new Integer[0]);
 
+    float cost = 0;
 
-    //return c;
+    for (int i=0; i < spaceArr.length; i++) {
+      float dist = Float.POSITIVE_INFINITY;
 
+      for (int j=0; j < solutionArr.length; j++) {
 
-    return staticAlgo.cost();
+        float d = metric.d(space.get(spaceArr[i]), space.get(solutionArr[j]));
+        if (d <= dist) dist = d;
+      }
+
+      cost += dist;
+    }
+
+    return cost;
+  }
+
+  public float cluster() {
+    return cluster(true);
   }
 
   ////____//// METHODS FOR TESTING ////____////

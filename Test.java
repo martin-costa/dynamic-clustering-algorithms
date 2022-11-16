@@ -21,9 +21,9 @@ public class Test {
   public static void main(String[] args) throws IOException, InterruptedException {
 
     // parameter k
-    int k = 20;
+    int k = 7;
 
-    DynamicMP coreset = new DynamicMP(k, new LpNorm(1), 1.0f, 0.5f, 0.1f);
+    DynamicMP coreset = new DynamicMP(k, new LpNorm(1), 5.0f, 0.5f, 0.15f);
 
     // create un update stream of length n
     int n = 2000;
@@ -41,7 +41,7 @@ public class Test {
     for (int i = 0; i < updateStream.streamLength(); i++) {
 
       // output metrics
-      //coreset.printStats();
+      coreset.printStats();
 
       // if we have an insertion
       if (updateStream.updateType(i)) {
@@ -55,26 +55,20 @@ public class Test {
         activePoints.remove(updateStream.key(i));
       }
 
-      if (i % 100 == 0) {
+      if (i % 1 == 0) {
 
-        staticKMedian.cluster(activePoints);
+        //staticKMedian.cluster(activePoints);
 
         //System.out.println(staticKMedian.cost());
 
-        System.out.println(coreset.cluster() / staticKMedian.cost());
+        //System.out.println(coreset.cluster() / staticKMedian.cost());
 
         //System.out.println(coreset.cluster());
 
         System.out.println(i);
-
         System.out.println("");
 
       }
-
-
     }
-
-    // treemap time: 98957, 99489
-    // hashmap time: 102460, 103128
   }
 }

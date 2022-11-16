@@ -118,7 +118,13 @@ public class OnlineKMedian {
     // if we can take everything as a median
     if (n <= k) {
       clusteringCost = 0;
-      return null;
+
+      // place all the keys into a BBT
+      TreeMap<Integer, Integer> solution = new TreeMap<Integer, Integer>();
+      for (int i=0; i < n; i++) {
+        solution.put(keysArr[i], keysArr[i]);
+      }
+      return solution;
     }
 
     // implementation of online k-median algorithm
@@ -329,9 +335,6 @@ public class OnlineKMedian {
         ballValueAux2[i][j] = ballValueAux2[i][j-1] + sortedPointsDistArr[i][j]*weightsArr[sortedPointsArr[i][j]];
       }
     }
-
-    // System.out.println(Arrays.deepToString(sortedPointsArr));
-    // System.out.println(Arrays.deepToString(sortedPointsDistArr));
   }
 
   // returns the cost of the clustering
