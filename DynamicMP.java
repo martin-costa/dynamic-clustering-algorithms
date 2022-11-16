@@ -229,9 +229,9 @@ public class DynamicMP {
 
     for (int i = 0; i < n; i++) {
 
-      dist[i] = this.metric.d(this.space.get(points[i]), this.space.get(layerSamplesArr[0]));
+      dist[i] = Float.POSITIVE_INFINITY;
       assignment[i] = 0;
-      for (int j = 1; j < m; j++) {
+      for (int j = 0; j < m; j++) {
         float x = this.metric.d(this.space.get(points[i]), this.space.get(layerSamplesArr[j]));
         if (x < dist[i]) {
           dist[i] = x;

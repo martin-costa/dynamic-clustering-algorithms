@@ -1,64 +1,89 @@
 import java.util.*;
 import java.io.*;
+import java.lang.*;
+//import javafx.util.*;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
 public class Test {
 
+  // 'census' input path
+  private static String census = "../data/census_data";
+
+  // 'song' input path
+  private static String song = "../data/song";
+
+  // 'kddcup' input path
+  private static String kddcup = "../data/kddcup";
+
+  // main function to run tests
   public static void main(String[] args) throws IOException, InterruptedException {
 
-    System.out.println(WW);
+    // test2();
+    //
+    // if (true) {
+    //   return;
+    // }
 
-    DynamicMP coreset = new DynamicMP(7, new LpNorm(1), 1.0f, 0.5f, 0.1f);
+    // parameter k
+    int k = 7;
 
-    // 'census' input path
-    String census = "../data/census_data";
-
-    // 'song' input path
-    String song = "../data/song";
-
-    // 'kddcup' input path
-    String kddcup = "../data/kddcup";
+    DynamicMP coreset = new DynamicMP(k, new LpNorm(1), 1.0f, 0.5f, 0.1f);
 
     // create un update stream of length n
-    int n = 10000;
-    int windowLength = 5000;
+    int n = 10;
+    int windowLength = 5;
 
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, song);
 
-    long startTime = System.currentTimeMillis();
+    // create a static algorithm
+    OnlineKMedian staticKMedian = new OnlineKMedian(k, new LpNorm(1));
+
+    // maintain the current instance in this BBT
+    TreeMap<Integer, float[]> activePoints = new TreeMap<Integer, float[]>();
 
     // run the coreset on this update stream
     for (int i = 0; i < updateStream.streamLength(); i++) {
 
       // output metrics
-
-      //TimeUnit.MILLISECONDS.sleep(1);
-      //coreset.printStats();
-      //System.out.println(i);
-
-      if (i % 500 == 0) {
-        System.out.println(i);
-      }
+      coreset.printStats();
 
       // if we have an insertion
       if (updateStream.updateType(i)) {
         coreset.insert(updateStream.key(i), updateStream.point(i));
+        activePoints.put(updateStream.key(i), updateStream.point(i));
       }
 
       // if we have a deletion
       else {
         coreset.delete(updateStream.key(i));
+        activePoints.remove(updateStream.key(i));
       }
+
+      staticKMedian.cluster(activePoints);
     }
-
-    long endTime = System.currentTimeMillis();
-    long runtime = endTime - startTime;
-
-    System.out.println(runtime);
 
     // treemap time: 98957, 99489
     // hashmap time: 102460, 103128
+  }
+
+  public static void test2() {
+
+    float[] A = new float[4];
+
+    A[0] = 8;
+    A[1] = 10;
+    A[2] = 12;
+    A[3] = 91;
+
+    int i = Arrays.binarySearch(A, 0.0f);
+
+    if (i < 0) {
+      i = -i-2;
+    }
+
+    System.out.println(i);
+
   }
 }
