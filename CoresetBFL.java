@@ -24,6 +24,7 @@ public class CoresetBFL {
 
 }
 
+// an implementation of the kmeans++ algorithm
 class KMeansPlusPlus {
 
   // the points that we want to cluster
@@ -75,7 +76,7 @@ class KMeansPlusPlus {
     // RETURN IF n IS SMALL
 
     // seed good starting centers
-    seedStaringCenters();
+    seedStartingCenters();
 
     // run k iterations of kmeans
     kmeans(iterations);
@@ -84,12 +85,87 @@ class KMeansPlusPlus {
   }
 
   // find a good starting point for kmeans
-  public void seedStaringCenters() {
+  private void seedStartingCenters() {
+
+    // get an array of the keys of all the points
+    Integer[] pointsArr = points.keySet().toArray(new Integer[0]);
+
+    // get an array of the keys of all the points
+    float[] weightsArr = new float[n];
+
+    // distances from samples points
+    float[] dist = new float[n];
+    Arrays.fill(dist, Float.POSITIVE_INFINITY);
+
+    // total weight of points
+    float totalWeight = 0;
+
+    for (int i = 0; i < n; i++) {
+      weightsArr[i] = weights.get(pointsArr[i]);
+      totalWeight += weightsArr[i];
+    }
+
+    // create array with sampling probabilities
+    float[] probs = new float[n];
+
+    for (int i = 0; i < n; i++) {
+      probs[i] = weightsArr[i]/totalWeight;
+    }
+
+    // create random number generator
+    Random rng = new Random();
+
+    int[] samples = new int[k];
+
+    for (int i = 0; i < k; i++) {
+      samples[i] = pointsArr[dSquaredWeighting(rng, probs, dist, pointsArr, weightsArr)];
+    }
 
   }
 
+  // sample a point according to D^2 weighting
+  private int dSquaredWeighting(Random rng, float[] probs, float[] dist, Integer[] pointsArr, float[] weightsArr) {
+
+    float r = rng.nextFloat();
+    float s = 0;
+
+    int sample = -1;
+
+    // sample a point from the distribution defined by probs
+    for (int i = 0; i < n; i++) {
+      s += probs[i];
+      if (r <= s) {
+        sample = i;
+        break;
+      }
+    }
+
+    // compute the new distances and probabilities
+    float totalDSquared = 0;
+
+    for (int i = 0; i < n; i++) {
+      dist[i] = Math.min(dist[i], metric.d(points.get(pointsArr[i]), points.get(pointsArr[sample])));
+      totalDSquared += weightsArr[i]*dist[i]*dist[i];
+    }
+
+    // we every points is already at a point thats been sampled
+    if (totalDSquared <= 0) {
+      probs[0] = 1;
+      for (int i = 1; i < n; i++) {
+        probs[i] = 0;
+      }
+      return sample;
+    }
+
+    for (int i = 0; i < n; i++) {
+      probs[i] = weightsArr[i]*dist[i]*dist[i]/totalDSquared;
+    }
+
+    return sample;
+  }
+
   // standard kmeans
-  public void kmeans(int iterations) {
+  private void kmeans(int iterations) {
 
     // run iterations many interations of kmeans heuristic
     for (int i = 0; i < iterations; i++) {
@@ -98,7 +174,7 @@ class KMeansPlusPlus {
   }
 
   // one iteration of kmeans
-  public void kmeansIteration() {
+  private void kmeansIteration() {
 
     // find the centers of mass
     float[][] newCenters = new float[k][d];
@@ -138,7 +214,7 @@ class KMeansPlusPlus {
   }
 
   // returns the center of mass of cluster i
-  public float[] clusterCenterOfMass(int i) {
+  private float[] clusterCenterOfMass(int i) {
 
     // the center of mass
     float[] center = new float[d];
