@@ -288,7 +288,7 @@ public class DynamicMP {
   }
 
   // clusters the coreset and returns the value of the clustering
-  public float cluster(boolean computeCost) {
+  public TreeMap<Integer, Integer> cluster() {
 
     TreeMap<Integer, Float> coresetWeights = new TreeMap<Integer, Float>();
 
@@ -316,33 +316,7 @@ public class DynamicMP {
     // call the static algorithm on the coreset
     OnlineKMedian staticAlgo = new OnlineKMedian(k, metric);
 
-    TreeMap<Integer, Integer> solution = staticAlgo.cluster(coresetPoints, coresetWeights);
-
-    // compute the cost of the solution if required
-    if (!computeCost) return -1;
-
-    Integer[] spaceArr = space.keySet().toArray(new Integer[0]);
-    Integer[] solutionArr = solution.keySet().toArray(new Integer[0]);
-
-    float cost = 0;
-
-    for (int i=0; i < spaceArr.length; i++) {
-      float dist = Float.POSITIVE_INFINITY;
-
-      for (int j=0; j < solutionArr.length; j++) {
-
-        float d = metric.d(space.get(spaceArr[i]), space.get(solutionArr[j]));
-        if (d <= dist) dist = d;
-      }
-
-      cost += dist;
-    }
-
-    return cost;
-  }
-
-  public float cluster() {
-    return cluster(true);
+    return staticAlgo.cluster(coresetPoints, coresetWeights);
   }
 
   ////____//// METHODS FOR TESTING ////____////

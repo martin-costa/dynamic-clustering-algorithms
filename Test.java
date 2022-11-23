@@ -23,16 +23,22 @@ public class Test {
     // parameter k
     int k = 7;
 
-    DynamicMP coreset = new DynamicMP(k, new LpNorm(1), 5.0f, 0.5f, 0.15f);
+    // the metric to be used
+    Metric metric = new LpNorm(1);
+
+    DynamicMP dynamicMP = new DynamicMP(k, metric, 5.0f, 0.75f, 0.2f);
 
     // create un update stream of length n
-    int n = 2000;
-    int windowLength = 2000;
+    int n = 5000;
+    int windowLength = 5000;
 
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
 
     // create a static algorithm
-    OnlineKMedian staticKMedian = new OnlineKMedian(k, new LpNorm(1));
+    OnlineKMedian staticKMedian = new OnlineKMedian(k, metric);
+
+    // kmeansplusplus static algorithm
+    KMeansPlusPlus kmeanspp = new KMeansPlusPlus(k, metric);
 
     // maintain the current instance in this BBT
     TreeMap<Integer, float[]> activePoints = new TreeMap<Integer, float[]>();
@@ -41,34 +47,66 @@ public class Test {
     for (int i = 0; i < updateStream.streamLength(); i++) {
 
       // output metrics
-      coreset.printStats();
+      //dynamicMP.printStats();
 
       // if we have an insertion
       if (updateStream.updateType(i)) {
-        coreset.insert(updateStream.key(i), updateStream.point(i));
+        dynamicMP.insert(updateStream.key(i), updateStream.point(i));
         activePoints.put(updateStream.key(i), updateStream.point(i));
       }
 
       // if we have a deletion
       else {
-        coreset.delete(updateStream.key(i));
+        dynamicMP.delete(updateStream.key(i));
         activePoints.remove(updateStream.key(i));
       }
 
-      if (i % 1 == 0) {
+      if (i % 25 == 0) {
 
-        //staticKMedian.cluster(activePoints);
+        // our dynamic algorithm
+        TreeMap<Integer, Integer> dynamicMPSolution = dynamicMP.cluster();
+        float dynamicMPCost = cost(activePoints, dynamicMPSolution, metric);
+        System.out.println(dynamicMPCost);
 
-        //System.out.println(staticKMedian.cost());
+        // static online k median
+        TreeMap<Integer, Integer> staticKMedianSolution = staticKMedian.cluster(activePoints);
+        float staticKMedianCost = cost(activePoints, staticKMedianSolution, metric);
+        System.out.println(staticKMedianCost);
 
-        //System.out.println(coreset.cluster() / staticKMedian.cost());
-
-        //System.out.println(coreset.cluster());
+        // kmeansplusplus
+        TreeMap<Integer, Integer> kmeansppSolution = kmeanspp.cluster(activePoints);
+        float kmeansppCost = cost(activePoints, kmeansppSolution, metric);
+        System.out.println(kmeansppCost);
 
         System.out.println(i);
         System.out.println("");
-
+      }
+      else {
+        //System.out.println(i);
       }
     }
+  }
+
+  // compute the cost of solution with respect points with this metric
+  public static float cost(TreeMap<Integer, float[]> points, TreeMap<Integer, Integer> solution, Metric metric) {
+
+    Integer[] pointsArr = points.keySet().toArray(new Integer[0]);
+    Integer[] solutionArr = solution.keySet().toArray(new Integer[0]);
+
+    float cost = 0;
+
+    for (int i = 0; i < pointsArr.length; i++) {
+      float dist = Float.POSITIVE_INFINITY;
+
+      for (int j = 0; j < solutionArr.length; j++) {
+
+        float d = metric.d(points.get(pointsArr[i]), points.get(solutionArr[j]));
+        if (d <= dist) dist = d;
+      }
+
+      cost += dist;
+    }
+
+    return cost;
   }
 }
