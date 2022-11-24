@@ -33,6 +33,9 @@ class KMeansPlusPlus {
   // the clusters we want to find
   private TreeMap<Integer, Integer>[] clusters;
 
+  // the centers of these clusters
+  private int[] clusterCenters;
+
   // set the metric and the value k
   KMeansPlusPlus(int k, Metric metric, int iterations) {
     this.metric = metric;
@@ -106,9 +109,13 @@ class KMeansPlusPlus {
     // get the centers from the clusters and return them
     TreeMap<Integer, Integer> solution = new TreeMap<Integer, Integer>();
 
+    // put cluster centers in an array
+    this.clusterCenters = new int[k];
+
     for (int i = 0; i < k; i++) {
       int p = getClusterCenter(i);
       solution.put(p, p);
+      this.clusterCenters[i] = p;
     }
 
     return solution;
@@ -305,5 +312,15 @@ class KMeansPlusPlus {
     }
 
     return center;
+  }
+
+  // get the clusters
+  public TreeMap<Integer, Integer>[] getClusters() {
+    return clusters;
+  }
+
+  // get the cluster centers
+  public int[] getClusterCenters() {
+    return clusterCenters;
   }
 }
