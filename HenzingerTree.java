@@ -41,6 +41,8 @@ public class HenzingerTree {
   private TreeMap<Integer, float[]> outPoints;
   private TreeMap<Integer, Float> outWeights;
 
+  private CoresetBFL outercore;
+
   public HenzingerTree(int k, Metric metric, float epsilon) {
     this.k = k;
     this.metric = metric;
@@ -52,8 +54,7 @@ public class HenzingerTree {
     this.np = 0;
     this.phaseCounter = 0;
 
-    this.outPoints = new TreeMap<Integer, float[]>();
-    this.outWeights = new TreeMap<Integer, Float>();
+    this.outercore = new CoresetBFL(k, metric, 1);
   }
 
   // insert a point (we only care about unweighted points)
@@ -176,6 +177,8 @@ public class HenzingerTree {
   private void outerInstance() {
 
     if (root == null) {
+      this.outPoints = new TreeMap<Integer, float[]>();
+      this.outWeights = new TreeMap<Integer, Float>();
       return;
     }
 
@@ -183,16 +186,39 @@ public class HenzingerTree {
     TreeMap<Integer, Float> inWeights = root.getWeights();
 
     // run the outercore
+    outercore.construct(inPoints, inWeights, 1/(2*((float)Math.log(np + 1) + 1)), epsilon/3);
+
+    outPoints = outercore.getPoints();
+    outWeights = outercore.getWeights();
+  }
+
+  // cluster the points in the corset
+  public TreeMap<Integer, Integer> cluster() {
+
+    // call the static algorithm on the outercore output
+    OnlineKMedian staticAlgo = new OnlineKMedian(k, metric);
+
+    return staticAlgo.cluster(outPoints, outWeights);
   }
 
   // the parameter lambda for inner ALG instances
   private float lambda() {
-    return 1.0f/(2*np*np);
+    return 1.0f/(2*((float)Math.log(np + 1) + 1)*np);
   }
 
   // the paramter epsilon for inner ALG instances
   private float epsilon() {
     return this.epsilon/(6*(float)Math.log(np));
+  }
+
+  // returns the points computed by the tree
+  public TreeMap<Integer, float[]> getPoints() {
+    return outPoints;
+  }
+
+  // returns the weights computed by the tree
+  public TreeMap<Integer, Float> getWeights() {
+    return outWeights;
   }
 
   // print for debugging
@@ -250,12 +276,17 @@ class Internal extends Node {
   private TreeMap<Integer, float[]> outPoints;
   private TreeMap<Integer, Float> outWeights;
 
+  // the coreset maintained here
+  private CoresetBFL innercore;
+
   Internal(int k, Metric metric) {
     this.k = k;
     this.metric = metric;
 
     outPoints = new TreeMap<Integer, float[]>();
     outWeights = new TreeMap<Integer, Float>();
+
+    innercore = new CoresetBFL(k, metric, 1);
   }
 
   // continue the recomputation
@@ -268,11 +299,24 @@ class Internal extends Node {
       parent.recomputeUpwards(n, lambda, epsilon);
   }
 
-  // recompute this node
+  // run the static coreset algorithm on union of inputs
   public void recompute(int n, float lambda, float epsilon) {
 
-    // run the static coreset algorithm on union of inputs
+    // get the union of the inputs
+    TreeMap<Integer, float[]> inPoints = new TreeMap<Integer, float[]>();
+    TreeMap<Integer, Float> inWeights = new TreeMap<Integer, Float>();
 
+    inPoints.putAll(left.getPoints());
+    inPoints.putAll(right.getPoints());
+
+    inWeights.putAll(left.getWeights());
+    inWeights.putAll(right.getWeights());
+
+    // compute the coreset
+    innercore.construct(inPoints, inWeights, lambda, epsilon);
+
+    outPoints = innercore.getPoints();
+    outWeights = innercore.getWeights();
   }
 
   // return coreset output points

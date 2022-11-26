@@ -21,7 +21,7 @@ public class Test {
   public static void main(String[] args) throws IOException, InterruptedException {
 
     // parameter k
-    int k = 50;
+    int k = 15;
 
     // the metric to be used
     Metric metric = new LpNorm(1);
@@ -29,8 +29,8 @@ public class Test {
     DynamicMP dynamicMP = new DynamicMP(k, metric, 5.0f, 0.75f, 0.2f);
 
     // create un update stream of length n
-    int n = 20000;
-    int windowLength = 1000;
+    int n = 500;
+    int windowLength = 500;
 
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
 
@@ -61,15 +61,15 @@ public class Test {
         activePoints.remove(updateStream.key(i));
       }
 
-      if (i % 2500000 == 0) {
+      if (i % 1 == 0) {
 
         // our dynamic algorithm
-        // TreeMap<Integer, Integer> dynamicMPSolution = dynamicMP.cluster();
+        TreeMap<Integer, Integer> dynamicMPSolution = dynamicMP.cluster();
         // float dynamicMPCost = cost(activePoints, dynamicMPSolution, metric);
         // System.out.println(dynamicMPCost);
 
         // static online k median
-        // TreeMap<Integer, Integer> staticKMedianSolution = staticKMedian.cluster(activePoints);
+        //TreeMap<Integer, Integer> staticKMedianSolution = staticKMedian.cluster(activePoints);
         // float staticKMedianCost = cost(activePoints, staticKMedianSolution, metric);
         // System.out.println(staticKMedianCost);
 

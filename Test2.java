@@ -21,18 +21,29 @@ public class Test2 {
   public static void main(String[] args) throws IOException, InterruptedException {
 
     // parameter k
-    int k = 50;
+    int k = 15;
 
     // the metric to be used
     Metric metric = new LpNorm(1);
 
     HenzingerTree T = new HenzingerTree(k, metric, 1);
 
-    for (int i = 0; i < 5; i++) {
-      T.insert(i, null);
+    Random rng = new Random();
+
+    for (int i = 0; i < 500; i++) {
+
+      //System.out.println(i);
+
+      float[] a = new float[10];
+      for (int j = 0; j < 10; j++) {
+        a[j] = rng.nextFloat();
+      }
+
+      T.insert(i, a);
     }
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 500; i++) {
+      //System.out.println(i);
       T.delete(i);
     }
 

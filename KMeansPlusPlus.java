@@ -109,7 +109,7 @@ class KMeansPlusPlus {
     // get the centers from the clusters and return them
     TreeMap<Integer, Integer> solution = new TreeMap<Integer, Integer>();
 
-    // put cluster centers in an array
+    // put cluster centers
     this.clusterCenters = new int[k];
 
     for (int i = 0; i < k; i++) {
