@@ -77,12 +77,12 @@ public class CoresetBFL {
 
   // returns the points computed by the coreset
   public TreeMap<Integer, float[]> getPoints() {
-    return null;
+    return outPoints;
   }
 
   // returns the weights computed by the coreset
   public TreeMap<Integer, Float> getWeights() {
-    return null;
+    return outWeights;
   }
 
 

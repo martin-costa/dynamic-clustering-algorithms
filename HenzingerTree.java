@@ -14,7 +14,11 @@ public class HenzingerTree {
   private Node root;
 
   // pointer to the leaf where the next leaf will be added
-  private Node insertionPointer;
+  // NOTE: the location of the next deletion is deletionPoint.last
+  private Leaf insertionPoint;
+
+  // the refresh pointers
+  private Leaf refreshPointer;
 
   // pointers to the leaves that cointain each point
   private TreeMap<Integer, Leaf> leafFinder;
@@ -24,34 +28,185 @@ public class HenzingerTree {
 
   // save parameters to feed to new nodes when we create them
   private int k;
+
   private Metric metric;
 
-  public HenzingerTree(int k, Metric metric) {
+  private float epsilon;
+
+  // phase parameters
+  private int np;
+  private int phaseCounter;
+
+  // the output of the final coreset
+  private TreeMap<Integer, float[]> outPoints;
+  private TreeMap<Integer, Float> outWeights;
+
+  public HenzingerTree(int k, Metric metric, float epsilon) {
     this.k = k;
     this.metric = metric;
-    this.n = 0;
+    this.epsilon = epsilon;
+
     this.leafFinder = new TreeMap<Integer, Leaf>();
+    this.n = 0;
+
+    this.np = 0;
+    this.phaseCounter = 0;
+
+    this.outPoints = new TreeMap<Integer, float[]>();
+    this.outWeights = new TreeMap<Integer, Float>();
   }
 
   // insert a point (we only care about unweighted points)
   public void insert(int key, float[] point) {
 
-    // create a new node for our
-    //nodeFinder.put(key, newNode);
+    refresher();
 
+    // if this point is already in the tree, do nothing
+    if (leafFinder.get(key) != null) return;
+
+    // create new leaf
+    Leaf leaf = new Leaf(k, metric, key, point);
+
+    // check if the tree is empty
+    if (n == 0) {
+
+      leaf.next = leaf;
+      leaf.last = leaf;
+
+      root = leaf;
+
+      // the insertion point is the root
+      insertionPoint = leaf;
+
+      // add root to map
+      leafFinder.put(key, leaf);
+
+      n = 1;
+    }
+    else {
+
+      // insert the point
+      Internal internal = insertionPoint.insert(leaf, np, lambda(), epsilon());
+
+      if (n == 1) {
+        root = internal;
+      }
+
+      // add new leaf to map
+      leafFinder.put(key, leaf);
+
+      // reset the position of the insertion pointer
+      insertionPoint = leaf.next;
+
+      n += 1;
+    }
+
+    outerInstance();
   }
 
   // delete a point from the tree
   public void delete(int key) {
 
+    refresher();
+
+    // get the node contining the key to be deleted
+    Leaf leafToReplace = leafFinder.get(key);
+
+    // if this point is not in the tree, do nothing
+    if (leafToReplace == null) return;
+
+    // if the tree will be empty after this update, delete it
+    if (n == 1) {
+
+      // set the root and insertionPoint to null
+      root = null;
+      insertionPoint = null;
+
+      leafFinder.remove(key);
+
+      n = 0;
+    }
+    else {
+
+      // delete the last leaf in the tree
+      Leaf deadLeaf = insertionPoint.last.delete(np, lambda(), epsilon());
+
+      // reset the position of the insertion pointer
+      insertionPoint = insertionPoint.last;
+
+      // remove dead leaf from leafFinder
+      leafFinder.remove(deadLeaf.key());
+
+      n -= 1;
+
+      // if we have deleted the correct leaf
+      if (deadLeaf.key() != key) {
+        leafToReplace.replace(deadLeaf.key(), deadLeaf.point(), np, lambda(), epsilon());
+        leafFinder.put(deadLeaf.key(), leafToReplace);
+      }
+    }
+
+    outerInstance();
   }
 
   // move refresher pointer
-  public void refresher() {
+  private void refresher() {
 
+    phaseCounter--;
+
+    // start new phase
+    if (phaseCounter <= 0) {
+      np = 4*n;
+      phaseCounter = n/2;
+      refreshPointer = insertionPoint;
+    }
+
+    if (phaseCounter <= 0 || refreshPointer == null) {
+      return;
+    }
+
+    // use refresh pointer
+    refreshPointer.recomputeUpwards(np, lambda(), epsilon());
+    refreshPointer = refreshPointer.next;
+    refreshPointer.recomputeUpwards(np, lambda(), epsilon());
+    refreshPointer = refreshPointer.next;
   }
 
+  // computes the final output corset of smaller size
+  private void outerInstance() {
+
+    if (root == null) {
+      return;
+    }
+
+    TreeMap<Integer, float[]> inPoints = root.getPoints();
+    TreeMap<Integer, Float> inWeights = root.getWeights();
+
+    // run the outercore
+  }
+
+  // the parameter lambda for inner ALG instances
+  private float lambda() {
+    return 1.0f/(2*np*np);
+  }
+
+  // the paramter epsilon for inner ALG instances
+  private float epsilon() {
+    return this.epsilon/(6*(float)Math.log(np));
+  }
+
+  // print for debugging
+  public void print() {
+    if (root != null)
+      root.print();
+  }
 }
+
+/*
+
+abstract class to define nodes for the Henzinger tree
+
+*/
 
 // class to define nodes for the Henzinger tree
 abstract class Node {
@@ -70,10 +225,19 @@ abstract class Node {
   public abstract TreeMap<Integer, Float> getWeights();
 
   // recomputes all notes from here to root
-  public abstract void recomputeUpwards();
+  public abstract void recomputeUpwards(int n, float lambda, float epsilon);
+
+  // for debugging
+  public abstract void print();
 }
 
-// create lass for internal (non-outer ALG nodes) nodes
+/*
+
+create class for internal (non-outer ALG nodes) nodes
+
+*/
+
+// create class for internal (non-outer ALG nodes) nodes
 class Internal extends Node {
 
   // left child of this node
@@ -89,19 +253,25 @@ class Internal extends Node {
   Internal(int k, Metric metric) {
     this.k = k;
     this.metric = metric;
+
+    outPoints = new TreeMap<Integer, float[]>();
+    outWeights = new TreeMap<Integer, Float>();
   }
 
-  // continute the recomputation
-  public void recomputeUpwards() {
+  // continue the recomputation
+  public void recomputeUpwards(int n, float lambda, float epsilon) {
 
     // recompute the coreset at this node
-    recompute();
+    recompute(n, lambda, epsilon);
 
-    parent.recomputeUpwards();
+    if (parent != null)
+      parent.recomputeUpwards(n, lambda, epsilon);
   }
 
   // recompute this node
-  public void recompute() {
+  public void recompute(int n, float lambda, float epsilon) {
+
+    // run the static coreset algorithm on union of inputs
 
   }
 
@@ -115,13 +285,18 @@ class Internal extends Node {
     return outWeights;
   }
 
-  // retrieves the leftmost leaf node of the tree
-  public Node leftmostLeaf() {
-    if (left != null)
-      return left;
-    return this;
+  // METHOD FOR DEBUGGING
+  public void print() {
+    left.print();
+    right.print();
   }
 }
+
+/*
+
+create class for leaf nodes
+
+*/
 
 // class for leaf nodes
 class Leaf extends Node {
@@ -138,7 +313,7 @@ class Leaf extends Node {
   // gets the previous leaf
   public Leaf last;
 
-  Leaf(int k, Metric Metric, int key, float[] point) {
+  Leaf(int k, Metric metric, int key, float[] point) {
     this.k = k;
     this.metric = metric;
     this.key = key;
@@ -146,10 +321,7 @@ class Leaf extends Node {
   }
 
   // turns leaf into an internal node and adds and returns a new leaf
-  public Leaf insert(int key, float[] point, int n, int s, float lamba, float epsilon) {
-
-    // create new leaf
-    Leaf leaf = new Leaf(k, metric, key, point);
+  public Internal insert(Leaf leaf, int n, float lambda, float epsilon) {
 
     // set the next and right pointers
     leaf.last = this;
@@ -160,35 +332,70 @@ class Leaf extends Node {
     // create new internal node
     Internal internal = new Internal(k, metric);
 
+    // set the pointer of the parent node
+    if (this.parent != null) {
+      if (this.parent.left.equals(this)) {
+        this.parent.left = internal;
+      }
+      else {
+        this.parent.right = internal;
+      }
+    }
+
     // set internal nodes parent and children
     internal.parent = this.parent;
     internal.left = this;
     internal.right = leaf;
 
-    // set this parent
+    // set this and leaf's parent
     this.parent = internal;
+    leaf.parent = internal;
 
     // recompute the node to leaf path from this.next
-    this.next.recomputeUpwards();
+    this.next.recomputeUpwards(n, lambda, epsilon);
 
-    return leaf;
+    // return the new leaf
+    return internal;
   }
 
-  // remove and return this leaf from the tree and replaces parent with a leaf
+  // remove this leaf from the tree and replaces parent with its sibling
   // NOTE: we assume in this method that the the tree is balanced and we are
   // deleting the last leaf on the lowest layer of the tree!
-  public Leaf delete() {
+  public Leaf delete(int n, float lambda, float epsilon) {
 
     // the leafs sibling
     Leaf leaf = (Leaf)this.parent.left;
 
-    // set grandparents right to left
-    this.parent.parent.right = leaf;
-
-    // fix leafs next pointer
+    // set the next and right pointers
     leaf.next = this.next;
+    this.next.last = leaf;
 
-    return this;
+    // set pointer of grandparent to leaf
+    if (this.parent.parent != null) {
+      if (this.parent.parent.left.equals(this.parent)) {
+        this.parent.parent.left = leaf;
+      }
+      else {
+        this.parent.parent.right = leaf;
+      }
+    }
+
+    // set leafs parent to its grandparent
+    leaf.parent = leaf.parent.parent;
+
+    // recompute the node to leaf path from leaf
+    leaf.recomputeUpwards(n, lambda, epsilon);
+
+    return leaf;
+  }
+
+  // replace the point at this leaf
+  public void replace(int key, float[] point, int n, float lambda, float epsilon) {
+    this.key = key;
+    this.point = point;
+
+    // recompute with the new point
+    recomputeUpwards(n, lambda, epsilon);
   }
 
   // return the single point
@@ -210,7 +417,23 @@ class Leaf extends Node {
   }
 
   // continute the recomputation
-  public void recomputeUpwards() {
-    parent.recomputeUpwards();
+  public void recomputeUpwards(int n, float lambda, float epsilon) {
+    if (parent != null)
+      parent.recomputeUpwards(n, lambda, epsilon);
+  }
+
+  // return the key at this leaf
+  public int key() {
+    return key;
+  }
+
+  // returns the point at this leaf
+  public float[] point() {
+    return point;
+  }
+
+  // PRINTING FOR DEBUGGING
+  public void print() {
+    System.out.println(key);
   }
 }
