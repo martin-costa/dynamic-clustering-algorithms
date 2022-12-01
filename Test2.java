@@ -30,9 +30,7 @@ public class Test2 {
 
     Random rng = new Random();
 
-    for (int i = 0; i < 500; i++) {
-
-      //System.out.println(i);
+    for (int i = 0; i < 1000; i++) {
 
       float[] a = new float[10];
       for (int j = 0; j < 10; j++) {
@@ -40,11 +38,14 @@ public class Test2 {
       }
 
       T.insert(i, a);
+
+      System.out.println(T.getPoints().size());
     }
 
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < 1000; i++) {
       //System.out.println(i);
       T.delete(i);
+      System.out.println(T.getPoints().size());
     }
 
     T.print();

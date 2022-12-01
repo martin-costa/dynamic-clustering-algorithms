@@ -55,6 +55,9 @@ public class HenzingerTree {
     this.phaseCounter = 0;
 
     this.outercore = new CoresetBFL(k, metric, 1);
+
+    this.outPoints = new TreeMap<Integer, float[]>();
+    this.outWeights = new TreeMap<Integer, Float>();
   }
 
   // insert a point (we only care about unweighted points)
@@ -185,8 +188,12 @@ public class HenzingerTree {
     TreeMap<Integer, float[]> inPoints = root.getPoints();
     TreeMap<Integer, Float> inWeights = root.getWeights();
 
+    //System.out.println(inPoints.size());
+
     // run the outercore
     outercore.construct(inPoints, inWeights, 1/(2*((float)Math.log(np + 1) + 1)), epsilon/3);
+
+    //System.out.println(outercore.getPoints().size());
 
     outPoints = outercore.getPoints();
     outWeights = outercore.getWeights();
