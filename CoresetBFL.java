@@ -68,22 +68,13 @@ public class CoresetBFL {
     // }
 
     // compute the coreset
-    float t = alpha;
-    float c = 1;
+    float t = (float)Math.max(1, Math.log(k)/5);
+    float c = (float)Math.max(1/Math.pow(4*epsilon, 2), 1);
 
-    float m1 = c*k*(t + 1)/(epsilon*epsilon);
+    float m1 = c*k*(t + 1);
     float m2 = (float)(Math.log(n)*Math.log(t) + Math.log(beta*k) + Math.log(1/lambda));
 
-    // making it actaully work
-    t = (float)Math.min(1, alpha/5);
-
-    m1 = c*k*t/((float)Math.max(1, epsilon*epsilon/10));
-    m2 = (float)(Math.log(n)*Math.log(t) + Math.log(beta*k) + Math.log(1/lambda));
-
     int m = (int)(m1*m2);
-
-    m = (int)(k*Math.max(Math.log(k), 1)*(Math.max(Math.log(n), 1)));
-    //m = (int)(k*(Math.max(Math.log(n), 1)));
 
     // System.out.print("n: ");
     // System.out.println(n);

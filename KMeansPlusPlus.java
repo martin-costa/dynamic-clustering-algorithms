@@ -211,7 +211,7 @@ class KMeansPlusPlus {
     float r = rng.nextFloat();
     float s = 0;
 
-    int sample = -1;
+    int sample = 0;
 
     // sample a point from the distribution defined by probs
     for (int i = 0; i < n; i++) {
