@@ -76,11 +76,6 @@ public class CoresetBFL {
 
     int m = (int)(m1*m2);
 
-    // System.out.print("n: ");
-    // System.out.println(n);
-    // System.out.print("m: ");
-    // System.out.println(m);
-
     // if there aren't enough points
     if (n < m) {
       outPoints = points;

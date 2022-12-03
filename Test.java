@@ -27,7 +27,7 @@ public class Test {
     Metric metric = new LpNorm(1);
 
     // our dynamic algorithm
-    DynamicMP dynamicMP = new DynamicMP(k, metric, 10.0f, 0.75f, 0.2f);
+    DynamicMP dynamicMP = new DynamicMP(k, metric, 5.0f, 0.75f, 0.2f);
 
     // the state of the art Henzinger Kale data structure
     HenzingerTree henzingerTree = new HenzingerTree(k, metric, 1.0f);
@@ -39,15 +39,18 @@ public class Test {
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
 
-    runTest(updateStream, dynamicMP, henzingerTree, metric, 10, true, true);
+    runTest(updateStream, dynamicMP, henzingerTree, metric, k, 1, true, true);
   }
 
   // test and compare the dynamic algorithms
-  public static void runTest(SlidingWindow updateStream, DynamicMP dynamicMP, HenzingerTree henzingerTree, Metric metric, int queryFrequency, boolean runMP, boolean runHK) {
+  public static void runTest(SlidingWindow updateStream, DynamicMP dynamicMP, HenzingerTree henzingerTree, Metric metric, int k, int queryFrequency, boolean runMP, boolean runHK) throws IOException {
 
-    // measures our upadate time and Henzinger update time (in nano seconds)
+    // measures our upadate and query time and Henzinger update time (in nano seconds)
     long updateTimeMP = 0;
     long updateTimeHK = 0;
+
+    long queryTimeMP = 0;
+    long queryTimeHK = 0;
 
     // cost of solution
     float dynamicMPCost = 0;
@@ -55,6 +58,14 @@ public class Test {
 
     // maintain the current instance in this BBT
     TreeMap<Integer, float[]> activePoints = new TreeMap<Integer, float[]>();
+
+    // create an output streams to write data into file
+    DataOutputStream BCLPupdatetimeWriter = new DataOutputStream(new FileOutputStream("../results/BCLP_updatetime_" + Integer.toString(k)));
+    DataOutputStream HK20updatetimeWriter = new DataOutputStream(new FileOutputStream("../results/HK20_updatetime_" + Integer.toString(k)));
+    DataOutputStream BCLPquerytimeWriter = new DataOutputStream(new FileOutputStream("../results/BCLP_querytime_" + Integer.toString(k)));
+    DataOutputStream HK20querytimeWriter = new DataOutputStream(new FileOutputStream("../results/HK20_querytime_" + Integer.toString(k)));
+    DataOutputStream BCLPcostWriter = new DataOutputStream(new FileOutputStream("../results/BCLP_cost_" + Integer.toString(k)));
+    DataOutputStream HK20costWriter = new DataOutputStream(new FileOutputStream("../results/HK20_cost_" + Integer.toString(k)));
 
     for (int i = 0; i < updateStream.streamLength(); i++) {
 
@@ -96,14 +107,31 @@ public class Test {
         activePoints.put(updateStream.key(i), updateStream.point(i));
       }
 
+      // perform queries
       if (i % queryFrequency == 0) {
-        TreeMap<Integer, Integer> dynamicMPSolution = dynamicMP.cluster();
-        TreeMap<Integer, Integer> henzingerSolution = henzingerTree.cluster();
-
-        dynamicMPCost = cost(activePoints, dynamicMPSolution, metric);
-        henzingerCost = cost(activePoints, henzingerSolution, metric);
+        if (runMP) {
+          long s = System.nanoTime();
+          TreeMap<Integer, Integer> dynamicMPSolution = dynamicMP.cluster();
+          queryTimeMP += System.nanoTime() - s;
+          dynamicMPCost = cost(activePoints, dynamicMPSolution, metric);
+        }
+        if (runHK) {
+          long s = System.nanoTime();
+          TreeMap<Integer, Integer> henzingerSolution = henzingerTree.cluster();
+          queryTimeHK += System.nanoTime() - s;
+          henzingerCost = cost(activePoints, henzingerSolution, metric);
+        }
       }
 
+      // write to files
+      BCLPupdatetimeWriter.writeChars(Long.toString(updateTimeMP) + "#");
+      HK20updatetimeWriter.writeChars(Long.toString(updateTimeHK) + "#");
+      BCLPquerytimeWriter.writeChars(Long.toString(queryTimeMP) + "#");
+      HK20querytimeWriter.writeChars(Long.toString(queryTimeHK) + "#");
+      BCLPcostWriter.writeChars(Float.toString(dynamicMPCost) + "#");
+      HK20costWriter.writeChars(Float.toString(henzingerCost) + "#");
+
+      // print
       System.out.println("------------\n");
       System.out.print("n = ");
       System.out.print(i);
@@ -120,6 +148,14 @@ public class Test {
         System.out.println(henzingerCost);
       }
     }
+
+    // close the output streams
+    BCLPupdatetimeWriter.close();
+    HK20updatetimeWriter.close();
+    BCLPquerytimeWriter.close();
+    HK20querytimeWriter.close();
+    BCLPcostWriter.close();
+    HK20costWriter.close();
   }
 
   // compute the cost of solution with respect points with this metric
