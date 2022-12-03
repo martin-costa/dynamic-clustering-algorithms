@@ -130,20 +130,20 @@ HK20_cost_250 = [0]*q
 fig, axs = plt.subplots(1, 3)
 
 # update times
-axs[0].plot(x_updates, BCLP_update_times_50, 'b-', label='BCLP')
 axs[0].plot(x_updates, HK20_update_times_50, 'r-', label='HK20')
+axs[0].plot(x_updates, BCLP_update_times_50, 'b-', label='BCLP')
 axs[0].set_title('Total Update Time, k = 50')
 axs[0].set(xlabel='Updates', ylabel='Total Update Time (sec)')
 axs[0].legend();
 
-axs[1].plot(x_queries, BCLP_query_times_50, 'b-', label='BCLP')
 axs[1].plot(x_queries, HK20_query_times_50, 'r-', label='HK20')
+axs[1].plot(x_queries, BCLP_query_times_50, 'b-', label='BCLP')
 axs[1].set_title('Total Query Time, k = 50')
 axs[1].set(xlabel='Updates', ylabel='Total Query Time (sec)')
 axs[1].legend();
 
-axs[2].plot(x_queries, BCLP_cost_50, 'b-', label='BCLP')
 axs[2].plot(x_queries, HK20_cost_50, 'r-', label='HK20')
+axs[2].plot(x_queries, BCLP_cost_50, 'b-', label='BCLP')
 axs[2].set_title('Cost of Solution, k = 50')
 axs[2].set(xlabel='Updates', ylabel='Cost')
 axs[2].legend();
