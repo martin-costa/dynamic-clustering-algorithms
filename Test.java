@@ -37,7 +37,7 @@ public class Test {
     int windowLength = 5000;
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, kddcup);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
 
     runTest(updateStream, dynamicMP, henzingerTree, metric, k, 10, true, true);
   }
@@ -132,7 +132,7 @@ public class Test {
         }
 
         // run static online k median
-        System.out.println(cost(activePoints, onlineKMedian.cluster(activePoints), metric));
+        onlineKMedian.cluster(activePoints)
         staticMPCost = onlineKMedian.cost();
 
         // run kmeans++
