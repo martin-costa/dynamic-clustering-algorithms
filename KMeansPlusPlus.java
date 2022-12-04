@@ -191,7 +191,11 @@ class KMeansPlusPlus {
 
     Integer[] clusterPoints = clusters[i].keySet().toArray(new Integer[0]);
 
-    int closestPoint = -1;
+    if (clusterPoints.length == 0) {
+      return points.firstKey();
+    }
+
+    int closestPoint = clusterPoints[0];
     float dist = Float.POSITIVE_INFINITY;
 
     for (Integer key : clusterPoints) {

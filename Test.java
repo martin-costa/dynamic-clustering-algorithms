@@ -168,9 +168,9 @@ public class Test {
         System.out.print("HK cost = ");
         System.out.println(henzingerCost);
         System.out.print("static MP cost = ");
-        System.out.println(dynamicMPCost);
+        System.out.println(staticMPCost);
         System.out.print("kmeans++ cost = ");
-        System.out.println(henzingerCost);
+        System.out.println(kmeansppCost);
       }
     }
 
@@ -188,8 +188,6 @@ public class Test {
 
     Integer[] pointsArr = points.keySet().toArray(new Integer[0]);
     Integer[] solutionArr = solution.keySet().toArray(new Integer[0]);
-
-    System.out.println(Arrays.toString(solutionArr));
 
     float cost = 0;
 
