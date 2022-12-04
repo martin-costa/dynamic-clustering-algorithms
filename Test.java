@@ -132,7 +132,7 @@ public class Test {
         }
 
         // run static online k median
-        onlineKMedian.cluster(activePoints)
+        onlineKMedian.cluster(activePoints);
         staticMPCost = onlineKMedian.cost();
 
         // run kmeans++
@@ -153,25 +153,25 @@ public class Test {
       }
 
       // print
-      // System.out.println("------------\n");
-      // System.out.print("n = ");
-      // System.out.print(i);
-      // System.out.println("");
-      // System.out.print("MP update time = ");
-      // System.out.println(updateTimeMP*0.000000001);
-      // System.out.print("HK update time = ");
-      // System.out.println(updateTimeHK*0.000000001);
-      // System.out.println("");
-      // if (i % queryFrequency == 0) {
-      //   System.out.print("MP cost = ");
-      //   System.out.println(dynamicMPCost);
-      //   System.out.print("HK cost = ");
-      //   System.out.println(henzingerCost);
-      //   System.out.print("static MP cost = ");
-      //   System.out.println(dynamicMPCost);
-      //   System.out.print("kmeans++ cost = ");
-      //   System.out.println(henzingerCost);
-      // }
+      System.out.println("------------\n");
+      System.out.print("n = ");
+      System.out.print(i);
+      System.out.println("");
+      System.out.print("MP update time = ");
+      System.out.println(updateTimeMP*0.000000001);
+      System.out.print("HK update time = ");
+      System.out.println(updateTimeHK*0.000000001);
+      System.out.println("");
+      if (i % queryFrequency == 0) {
+        System.out.print("MP cost = ");
+        System.out.println(dynamicMPCost);
+        System.out.print("HK cost = ");
+        System.out.println(henzingerCost);
+        System.out.print("static MP cost = ");
+        System.out.println(dynamicMPCost);
+        System.out.print("kmeans++ cost = ");
+        System.out.println(henzingerCost);
+      }
     }
 
     // close the output streams
@@ -195,6 +195,9 @@ public class Test {
       float dist = Float.POSITIVE_INFINITY;
 
       for (int j = 0; j < solutionArr.length; j++) {
+
+        System.out.println(Arrays.toString(points.get(pointsArr[i])));
+        System.out.println(Arrays.toString(points.get(solutionArr[j])));
 
         float d = metric.d(points.get(pointsArr[i]), points.get(solutionArr[j]));
         if (d <= dist) dist = d;
