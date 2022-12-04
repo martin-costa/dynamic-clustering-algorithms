@@ -189,15 +189,14 @@ public class Test {
     Integer[] pointsArr = points.keySet().toArray(new Integer[0]);
     Integer[] solutionArr = solution.keySet().toArray(new Integer[0]);
 
+    System.out.println(Arrays.toString(solutionArr));
+
     float cost = 0;
 
     for (int i = 0; i < pointsArr.length; i++) {
       float dist = Float.POSITIVE_INFINITY;
 
       for (int j = 0; j < solutionArr.length; j++) {
-
-        System.out.println(Arrays.toString(points.get(pointsArr[i])));
-        System.out.println(Arrays.toString(points.get(solutionArr[j])));
 
         float d = metric.d(points.get(pointsArr[i]), points.get(solutionArr[j]));
         if (d <= dist) dist = d;
