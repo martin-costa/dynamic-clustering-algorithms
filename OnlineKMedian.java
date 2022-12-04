@@ -141,7 +141,7 @@ public class OnlineKMedian {
 
       // update distances from medians
       for (int j=0; j < n; j++) {
-        distFromMedians[j] = Math.min(distFromMedians[j], metric.d(pointsArr[j], pointsArr[i]))*weightsArr[j];
+        distFromMedians[j] = Math.min(distFromMedians[j], metric.d(pointsArr[j], pointsArr[i])); // removed *weightsArr[j]?
       }
     }
 
@@ -155,7 +155,7 @@ public class OnlineKMedian {
     // compute the cost of the clustering
     clusteringCost = 0;
     for (int j = 0; j < n; j++) {
-      clusteringCost += distFromMedians[j];
+      clusteringCost += distFromMedians[j]*weightsArr[j];
     }
 
     return solution;
@@ -242,7 +242,7 @@ public class OnlineKMedian {
     return ball;
   }
 
-  // return the value of isolated(x, medians) for some x not in medians
+  // return the radius of isolated(x, medians) for some x not in medians
   private float isolated(int i) {
 
     // if there are no medians, return distance of furthest point

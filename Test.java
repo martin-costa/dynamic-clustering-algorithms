@@ -21,7 +21,7 @@ public class Test {
   public static void main(String[] args) throws IOException, InterruptedException {
 
     // parameter k
-    int k = 50;
+    int k = 10;
 
     // the metric to be used
     Metric metric = new LpNorm(1);
@@ -39,7 +39,7 @@ public class Test {
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
 
-    runTest(updateStream, dynamicMP, henzingerTree, metric, k, 1, true, true);
+    runTest(updateStream, dynamicMP, henzingerTree, metric, k, 10, true, true);
   }
 
   // test and compare the dynamic algorithms
@@ -55,17 +55,26 @@ public class Test {
     // cost of solution
     float dynamicMPCost = 0;
     float henzingerCost = 0;
+    float staticMPCost = 0;
+    float kmeansppCost = 0;
 
     // maintain the current instance in this BBT
     TreeMap<Integer, float[]> activePoints = new TreeMap<Integer, float[]>();
 
+    OnlineKMedian onlineKMedian = new OnlineKMedian(k, metric);
+    KMeansPlusPlus kmeanspp = new KMeansPlusPlus(k, metric);
+
     // create an output streams to write data into file
     DataOutputStream BCLPupdatetimeWriter = new DataOutputStream(new FileOutputStream("../results/BCLP_updatetime_" + Integer.toString(k)));
     DataOutputStream HK20updatetimeWriter = new DataOutputStream(new FileOutputStream("../results/HK20_updatetime_" + Integer.toString(k)));
+
     DataOutputStream BCLPquerytimeWriter = new DataOutputStream(new FileOutputStream("../results/BCLP_querytime_" + Integer.toString(k)));
     DataOutputStream HK20querytimeWriter = new DataOutputStream(new FileOutputStream("../results/HK20_querytime_" + Integer.toString(k)));
+
     DataOutputStream BCLPcostWriter = new DataOutputStream(new FileOutputStream("../results/BCLP_cost_" + Integer.toString(k)));
     DataOutputStream HK20costWriter = new DataOutputStream(new FileOutputStream("../results/HK20_cost_" + Integer.toString(k)));
+    DataOutputStream MP03costWriter = new DataOutputStream(new FileOutputStream("../results/MP03_cost_" + Integer.toString(k)));
+    DataOutputStream kmeansppcostWriter = new DataOutputStream(new FileOutputStream("../results/kmeanspp_cost_" + Integer.toString(k)));
 
     for (int i = 0; i < updateStream.streamLength(); i++) {
 
@@ -121,32 +130,51 @@ public class Test {
           queryTimeHK += System.nanoTime() - s;
           henzingerCost = cost(activePoints, henzingerSolution, metric);
         }
+
+        // run static online k median
+        System.out.println(cost(activePoints, onlineKMedian.cluster(activePoints), metric));
+        staticMPCost = onlineKMedian.cost();
+
+        System.out.println(onlineKMedian.cost());
+        System.out.println(cost(activePoints, onlineKMedian.cluster(activePoints), metric));
+
+        // run kmeans++
+        kmeansppCost = cost(activePoints, kmeanspp.cluster(activePoints), metric);
       }
 
       // write to files
       BCLPupdatetimeWriter.writeChars(Long.toString(updateTimeMP) + "#");
       HK20updatetimeWriter.writeChars(Long.toString(updateTimeHK) + "#");
-      BCLPquerytimeWriter.writeChars(Long.toString(queryTimeMP) + "#");
-      HK20querytimeWriter.writeChars(Long.toString(queryTimeHK) + "#");
-      BCLPcostWriter.writeChars(Float.toString(dynamicMPCost) + "#");
-      HK20costWriter.writeChars(Float.toString(henzingerCost) + "#");
+
+      if (i % queryFrequency == 0) {
+        BCLPquerytimeWriter.writeChars(Long.toString(queryTimeMP) + "#");
+        HK20querytimeWriter.writeChars(Long.toString(queryTimeHK) + "#");
+        BCLPcostWriter.writeChars(Float.toString(dynamicMPCost) + "#");
+        HK20costWriter.writeChars(Float.toString(henzingerCost) + "#");
+        MP03costWriter.writeChars(Float.toString(staticMPCost) + "#");
+        kmeansppcostWriter.writeChars(Float.toString(kmeansppCost) + "#");
+      }
 
       // print
-      System.out.println("------------\n");
-      System.out.print("n = ");
-      System.out.print(i);
-      System.out.println("");
-      System.out.print("MP update time = ");
-      System.out.println(updateTimeMP*0.000000001);
-      System.out.print("HK update time = ");
-      System.out.println(updateTimeHK*0.000000001);
-      System.out.println("");
-      if (i % queryFrequency == 0) {
-        System.out.print("MP cost = ");
-        System.out.println(dynamicMPCost);
-        System.out.print("HK cost = ");
-        System.out.println(henzingerCost);
-      }
+      // System.out.println("------------\n");
+      // System.out.print("n = ");
+      // System.out.print(i);
+      // System.out.println("");
+      // System.out.print("MP update time = ");
+      // System.out.println(updateTimeMP*0.000000001);
+      // System.out.print("HK update time = ");
+      // System.out.println(updateTimeHK*0.000000001);
+      // System.out.println("");
+      // if (i % queryFrequency == 0) {
+      //   System.out.print("MP cost = ");
+      //   System.out.println(dynamicMPCost);
+      //   System.out.print("HK cost = ");
+      //   System.out.println(henzingerCost);
+      //   System.out.print("static MP cost = ");
+      //   System.out.println(dynamicMPCost);
+      //   System.out.print("kmeans++ cost = ");
+      //   System.out.println(henzingerCost);
+      // }
     }
 
     // close the output streams
