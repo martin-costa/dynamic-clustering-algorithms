@@ -21,7 +21,7 @@ public class Test {
   public static void main(String[] args) throws IOException, InterruptedException {
 
     // parameter k
-    int k = 10;
+    int k = 50;
 
     // the metric to be used
     Metric metric = new LpNorm(1);
@@ -37,7 +37,7 @@ public class Test {
     int windowLength = 5000;
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, kddcup);
 
     runTest(updateStream, dynamicMP, henzingerTree, metric, k, 10, true, true);
   }
@@ -134,9 +134,6 @@ public class Test {
         // run static online k median
         System.out.println(cost(activePoints, onlineKMedian.cluster(activePoints), metric));
         staticMPCost = onlineKMedian.cost();
-
-        System.out.println(onlineKMedian.cost());
-        System.out.println(cost(activePoints, onlineKMedian.cluster(activePoints), metric));
 
         // run kmeans++
         kmeansppCost = cost(activePoints, kmeanspp.cluster(activePoints), metric);
