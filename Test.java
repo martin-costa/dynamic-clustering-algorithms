@@ -21,13 +21,13 @@ public class Test {
   public static void main(String[] args) throws IOException, InterruptedException {
 
     // parameter k
-    int k = 10;
+    int k = 50;
 
     // the metric to be used
     Metric metric = new LpNorm(1);
 
     // our dynamic algorithm
-    DynamicMP dynamicMP = new DynamicMP(k, metric, 5.0f, 0.75f, 0.2f);
+    DynamicMP dynamicMP = new DynamicMP(k, metric, 10.0f, 0.75f, 0.2f);
 
     // the state of the art Henzinger Kale data structure
     HenzingerTree henzingerTree = new HenzingerTree(k, metric, 1.0f);
@@ -37,7 +37,7 @@ public class Test {
     int windowLength = 5000;
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, kddcup);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
 
     runTest(updateStream, dynamicMP, henzingerTree, metric, k, 10, true, true);
   }

@@ -191,7 +191,7 @@ public class HenzingerTree {
     //System.out.println(inPoints.size());
 
     // run the outercore
-    outercore.construct(inPoints, inWeights, 1/(2*((float)Math.log(np + 1) + 1)), epsilon/3);
+    outercore.construct(inPoints, inWeights, 1/(((float)Math.log(np + 1) + 1)), epsilon);
 
     //System.out.println(outercore.getPoints().size());
 

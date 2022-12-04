@@ -60,16 +60,9 @@ public class CoresetBFL {
 
     int n = this.points.size();
 
-    // if we have at most k points, return as is
-    // if (n <= k) {
-    //   this.outPoints = points;
-    //   this.outWeights = weights;
-    //   return;
-    // }
-
     // compute the coreset
-    float t = (float)Math.max(1, Math.log(k)/5);
-    float c = (float)Math.max(1/Math.pow(4*epsilon, 2), 1);
+    float t = (float)Math.max(1, Math.log(k)/10);
+    float c = (float)Math.max(1/Math.pow(epsilon, 2), 1);
 
     float m1 = c*k*(t + 1);
     float m2 = (float)(Math.log(n)*Math.log(t) + Math.log(beta*k) + Math.log(1/lambda));
