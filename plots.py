@@ -35,10 +35,27 @@ def load_data(dataset, k):
     # MP03_cost = load_file('results/' + dataset + '_MP03_cost_' + str(k), float)
     kmeanspp_cost = load_file('results/' + dataset + '_kmeanspp_cost_' + str(k), float)
 
+    # make sure data has the right dimensions
+    BCLP_update_times, HK20_update_times = slice_data([BCLP_update_times, HK20_update_times])
+    BCLP_query_times, HK20_query_times, BCLP_cost, HK20_cost, kmeanspp_cost = slice_data([BCLP_query_times, HK20_query_times, BCLP_cost, HK20_cost, kmeanspp_cost])
+
     n = len(BCLP_update_times)
     q = len(BCLP_query_times)
 
     return n, q, [BCLP_update_times, HK20_update_times], [BCLP_query_times, HK20_query_times], [BCLP_cost, HK20_cost, kmeanspp_cost]
+
+# ensure all arrays are the same length
+def slice_data(arrays):
+
+    # smallest array length
+    l = len(arrays[0])
+    for i in range(1, len(arrays)):
+        l = min(l, len(arrays[i]))
+
+    for i in range(len(arrays)):
+        arrays[i] = arrays[i][0:l]
+
+    return arrays
 
 # create a plot for dataset and k
 def plot_data(dataset, k):
