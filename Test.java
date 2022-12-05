@@ -23,27 +23,31 @@ public class Test {
     // parameter k
     int k = 50;
 
-    // the metric to be used
-    Metric metric = new LpNorm(1);
-
-    // our dynamic algorithm
-    DynamicMP dynamicMP = new DynamicMP(k, metric, 10.0f, 0.75f, 0.2f);
-
-    // the state of the art Henzinger Kale data structure
-    HenzingerTree henzingerTree = new HenzingerTree(k, metric, 1.0f);
+    // number of queries to perform over the stream
+    int queryCount = 1000;
 
     // create un update stream of length n
     int n = 10000;
     int windowLength = 5000;
 
+    // the metric to be used
+    Metric metric = new LpNorm(1);
+
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
 
-    runTest(updateStream, dynamicMP, henzingerTree, metric, k, 10, true, true);
+    // the dynamic algorithms
+    DynamicMP dynamicMP = new DynamicMP(k, metric, 10.0f, 0.75f, 0.2f);
+    HenzingerTree henzingerTree = new HenzingerTree(k, metric, 1.0f);
+
+    runTest(updateStream, dynamicMP, henzingerTree, metric, k, queryCount, true, true);
   }
 
   // test and compare the dynamic algorithms
-  public static void runTest(SlidingWindow updateStream, DynamicMP dynamicMP, HenzingerTree henzingerTree, Metric metric, int k, int queryFrequency, boolean runMP, boolean runHK) throws IOException {
+  public static void runTest(SlidingWindow updateStream, DynamicMP dynamicMP, HenzingerTree henzingerTree, Metric metric, int k, int queryCount, boolean runMP, boolean runHK) throws IOException {
+
+    // query frequency
+    int queryFrequency = (int)(updateStream.streamLength()/queryCount);
 
     // measures our upadate and query time and Henzinger update time (in nano seconds)
     long updateTimeMP = 0;
@@ -132,11 +136,10 @@ public class Test {
         }
 
         // run static online k median
-        onlineKMedian.cluster(activePoints);
-        staticMPCost = onlineKMedian.cost();
+        staticMPCost = cost(activePoints, onlineKMedian.cluster(activePoints), metric);
 
         // run kmeans++
-        kmeansppCost = cost(activePoints, kmeanspp.cluster(activePoints), metric);
+        kmeansppCost = cost(activePoints, kmeanspp.clusterUniform(activePoints), metric);
       }
 
       // write to files

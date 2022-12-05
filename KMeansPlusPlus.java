@@ -49,7 +49,7 @@ class KMeansPlusPlus {
     this.iterations = 2;
   }
 
-  public TreeMap<Integer, Integer> cluster(TreeMap<Integer, float[]> points) {
+  public TreeMap<Integer, Integer> clusterUniform(TreeMap<Integer, float[]> points, TreeMap<Integer, Integer> startingConfig) {
 
     // set all the weights to be 1
     TreeMap<Integer, Float> weights = new TreeMap<Integer, Float>();
@@ -60,10 +60,14 @@ class KMeansPlusPlus {
       weights.put(key, 1.0f);
     }
 
-    return cluster(points, weights);
+    return cluster(points, weights, startingConfig);
   }
 
-  public TreeMap<Integer, Integer> cluster(TreeMap<Integer, float[]> points, TreeMap<Integer, Float> weights) {
+  public TreeMap<Integer, Integer> clusterUniform(TreeMap<Integer, float[]> points) {
+    return clusterUniform(points, null);
+  }
+
+  public TreeMap<Integer, Integer> cluster(TreeMap<Integer, float[]> points, TreeMap<Integer, Float> weights, TreeMap<Integer, Integer> startingConfig) {
 
     // set the points and the weights
     this.points = points;
@@ -77,11 +81,15 @@ class KMeansPlusPlus {
       this.d = points.get(points.firstKey()).length;
     }
 
-    return kmeansplusplus(iterations);
+    return kmeansplusplus(iterations, startingConfig);
+  }
+
+  public TreeMap<Integer, Integer> cluster(TreeMap<Integer, float[]> points, TreeMap<Integer, Float> weights) {
+    return cluster(points, weights, null);
   }
 
   // implementation of bicriteria approximation using kmeans++
-  public TreeMap<Integer, Integer> kmeansplusplus(int iterations) {
+  public TreeMap<Integer, Integer> kmeansplusplus(int iterations, TreeMap<Integer, Integer> startingConfig) {
 
     // if we have at most k points return each point as a center
     if (n <= k) {
@@ -94,25 +102,35 @@ class KMeansPlusPlus {
 
     this.clusters = clusterMaps;
 
-    // seed good starting centers and create clusters
-    seedStartingCenters();
+    if (startingConfig == null) {
+      // seed good starting centers and create clusters
+      seedStartingCenters();
+    }
+    else {
+
+      // get the points corresponding to the init config.
+      float[][] startingConfigPoints = new float[k][d];
+      Integer[] startingConfigArr = startingConfig.keySet().toArray(new Integer[0]);
+
+      int i = 0;
+      for (Integer key : startingConfigArr) {
+        startingConfigPoints[i] = points.get(key);
+        i++;
+      }
+
+      // create the initial clusters
+      createClusters(startingConfigPoints);
+    }
 
     // run k iterations of kmeans
     kmeans(iterations);
 
-    // get the centers from the clusters and return them
-    TreeMap<Integer, Integer> solution = new TreeMap<Integer, Integer>();
+    return createSolution();
+  }
 
-    // put cluster centers
-    this.clusterCenters = new int[k];
-
-    for (int i = 0; i < k; i++) {
-      int p = getClusterCenter(i);
-      solution.put(p, p);
-      this.clusterCenters[i] = p;
-    }
-
-    return solution;
+  // run using the seeding
+  public TreeMap<Integer, Integer> kmeansplusplus(int iterations) {
+    return kmeansplusplus(iterations, null);
   }
 
   // create a trivial solution if n is too small
@@ -338,6 +356,23 @@ class KMeansPlusPlus {
     }
 
     return center;
+  }
+
+  // get the centers from the clusters and return them
+  private TreeMap<Integer, Integer> createSolution() {
+
+    TreeMap<Integer, Integer> solution = new TreeMap<Integer, Integer>();
+
+    // put cluster centers
+    this.clusterCenters = new int[k];
+
+    for (int i = 0; i < k; i++) {
+      int p = getClusterCenter(i);
+      solution.put(p, p);
+      this.clusterCenters[i] = p;
+    }
+
+    return solution;
   }
 
   // get the clusters

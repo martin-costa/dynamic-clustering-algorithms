@@ -109,7 +109,12 @@ public class OnlineKMedian {
     // create the auxiliary data structures
     setUpDataStructures();
 
-    return cluster();
+    // get the clustering
+    TreeMap<Integer, Integer> solution = cluster();
+
+    // perform 2 iterations of Lloyd's and return
+    KMeansPlusPlus kmeanspp = new KMeansPlusPlus(k, metric);
+    return kmeanspp.cluster(points, weights, solution);
   }
 
   // implementation of online k-median algorithm
@@ -337,8 +342,8 @@ public class OnlineKMedian {
     }
   }
 
-  // returns the cost of the clustering
-  public float cost() {
-    return clusteringCost;
-  }
+  // returns the cost of the clustering // WILL NOT WORK AFTER NEW UPDATE
+  // public float cost() {
+  //   return clusteringCost;
+  // }
 }
