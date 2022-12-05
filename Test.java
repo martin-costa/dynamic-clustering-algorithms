@@ -31,7 +31,15 @@ public class Test {
 
     // create un update stream of length n
     int n = 10000;
-    int windowLength = 5000;
+    int windowLength = 1000;
+
+    if (args.length > 2) {
+      windowLength = Integer.parseInt(args[2]);
+    }
+
+    if (args.length > 3) {
+      n = Integer.parseInt(args[3]);
+    }
 
     // the metric to be used
     Metric metric = new LpNorm(1);
@@ -72,16 +80,16 @@ public class Test {
     KMeansPlusPlus kmeanspp = new KMeansPlusPlus(k, metric);
 
     // create an output streams to write data into file
-    DataOutputStream BCLPupdatetimeWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_BCLP_updatetime_" + Integer.toString(k)));
-    DataOutputStream HK20updatetimeWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_HK20_updatetime_" + Integer.toString(k)));
+    DataOutputStream BCLPupdatetimeWriter = new DataOutputStream(new FileOutputStream("results/" + dataset + "_BCLP_updatetime_" + Integer.toString(k)));
+    DataOutputStream HK20updatetimeWriter = new DataOutputStream(new FileOutputStream("results/" + dataset + "_HK20_updatetime_" + Integer.toString(k)));
 
-    DataOutputStream BCLPquerytimeWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_BCLP_querytime_" + Integer.toString(k)));
-    DataOutputStream HK20querytimeWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_HK20_querytime_" + Integer.toString(k)));
+    DataOutputStream BCLPquerytimeWriter = new DataOutputStream(new FileOutputStream("results/" + dataset + "_BCLP_querytime_" + Integer.toString(k)));
+    DataOutputStream HK20querytimeWriter = new DataOutputStream(new FileOutputStream("results/" + dataset + "_HK20_querytime_" + Integer.toString(k)));
 
-    DataOutputStream BCLPcostWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_BCLP_cost_" + Integer.toString(k)));
-    DataOutputStream HK20costWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_HK20_cost_" + Integer.toString(k)));
-    // DataOutputStream MP03costWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_MP03_cost_" + Integer.toString(k)));
-    DataOutputStream kmeansppcostWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_kmeanspp_cost_" + Integer.toString(k)));
+    DataOutputStream BCLPcostWriter = new DataOutputStream(new FileOutputStream("results/" + dataset + "_BCLP_cost_" + Integer.toString(k)));
+    DataOutputStream HK20costWriter = new DataOutputStream(new FileOutputStream("results/" + dataset + "_HK20_cost_" + Integer.toString(k)));
+    // DataOutputStream MP03costWriter = new DataOutputStream(new FileOutputStream("results/" + dataset + "_MP03_cost_" + Integer.toString(k)));
+    DataOutputStream kmeansppcostWriter = new DataOutputStream(new FileOutputStream("results/" + dataset + "_kmeanspp_cost_" + Integer.toString(k)));
 
     for (int i = 0; i < updateStream.streamLength(); i++) {
 

@@ -24,16 +24,16 @@ def load_file(path, f):
 # load data given the following parameters
 def load_data(dataset, k):
 
-    BCLP_update_times = load_file('../results/' + dataset + '_BCLP_updatetime_' + str(k), nano_to_seconds)
-    HK20_update_times = load_file('../results/' + dataset + '_HK20_updatetime_' + str(k), nano_to_seconds)
+    BCLP_update_times = load_file('results/' + dataset + '_BCLP_updatetime_' + str(k), nano_to_seconds)
+    HK20_update_times = load_file('results/' + dataset + '_HK20_updatetime_' + str(k), nano_to_seconds)
 
-    BCLP_query_times = load_file('../results/' + dataset + '_BCLP_querytime_' + str(k), nano_to_seconds)
-    HK20_query_times = load_file('../results/' + dataset + '_HK20_querytime_' + str(k), nano_to_seconds)
+    BCLP_query_times = load_file('results/' + dataset + '_BCLP_querytime_' + str(k), nano_to_seconds)
+    HK20_query_times = load_file('results/' + dataset + '_HK20_querytime_' + str(k), nano_to_seconds)
 
-    BCLP_cost = load_file('../results/' + dataset + '_BCLP_cost_' + str(k), float)
-    HK20_cost = load_file('../results/' + dataset + '_HK20_cost_' + str(k), float)
-    # MP03_cost = load_file('../results/' + dataset + '_MP03_cost_' + str(k), float)
-    kmeanspp_cost = load_file('../results/' + dataset + '_kmeanspp_cost_' + str(k), float)
+    BCLP_cost = load_file('results/' + dataset + '_BCLP_cost_' + str(k), float)
+    HK20_cost = load_file('results/' + dataset + '_HK20_cost_' + str(k), float)
+    # MP03_cost = load_file('results/' + dataset + '_MP03_cost_' + str(k), float)
+    kmeanspp_cost = load_file('results/' + dataset + '_kmeanspp_cost_' + str(k), float)
 
     n = len(BCLP_update_times)
     q = len(BCLP_query_times)
@@ -76,6 +76,8 @@ def plot_data(dataset, k):
     axs[2].legend();
 
     plt.suptitle(str(n) + ' Updates from the ' + dataset + ' Dataset, with k = ' + str(k))
+
+    fig.tight_layout()
 
     plt.show()
 
