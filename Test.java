@@ -34,7 +34,7 @@ public class Test {
     Metric metric = new LpNorm(1);
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, census);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, kddcup);
 
     // the dynamic algorithms
     DynamicMP dynamicMP = new DynamicMP(k, metric, 10.0f, 0.75f, 0.2f);
