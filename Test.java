@@ -170,9 +170,9 @@ public class Test {
 
       // print
       // System.out.println("------------\n");
-      // System.out.print("n = ");
-      // System.out.print(i);
-      // System.out.println("");
+      System.out.print("n = ");
+      System.out.print(i);
+      System.out.println("");
       // System.out.print("MP update time = ");
       // System.out.println(updateTimeMP*0.000000001);
       // System.out.print("HK update time = ");

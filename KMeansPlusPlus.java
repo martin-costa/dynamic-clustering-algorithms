@@ -77,8 +77,11 @@ class KMeansPlusPlus {
     this.n = points.size();
 
     // set the dimension of the data
-    if (this.n >= 0) {
+    if (this.n > 0) {
       this.d = points.get(points.firstKey()).length;
+    }
+    else {
+      return new TreeMap<Integer, Integer>();
     }
 
     return kmeansplusplus(iterations, startingConfig);
