@@ -25,6 +25,9 @@ public class DynamicMP {
   // the clusters for each layer
   private LinkedList<TreeMap<Integer, Integer>[]> clusters;
 
+  // the clusterd sorted by increasing distance from center
+  private LinkedList<TreeMap<Float, Integer>[]> sortedClusters;
+
   // number of updates since reconstruction at each layer
   private LinkedList<Integer> reconTimer;
 
@@ -68,6 +71,8 @@ public class DynamicMP {
     this.samples = new LinkedList<TreeMap<Integer, Float>>();
 
     this.clusters = new LinkedList<TreeMap<Integer, Integer>[]>();
+
+    this.sortedClusters = new LinkedList<TreeMap<Float, Integer>[]>();
 
     this.reconTimer = new LinkedList<Integer>();
   }
@@ -144,9 +149,9 @@ public class DynamicMP {
           // remove the point from the samples
           layerSamples.remove(key);
 
-          // replace sampled point with an arbitrary point in the cluster
+          // replace sampled point with the next clostsest point in the cluster
           if (!cluster.isEmpty()) {
-            Integer newCenter = cluster.firstKey();
+            Integer newCenter = getClosestPoint(cluster, this.sortedClusters.get(i)[clusterIndex]);
             layerSamples.put(newCenter, (float)cluster.size());
           }
         }
@@ -162,6 +167,23 @@ public class DynamicMP {
 
     // check if data structure needs to be reconstructed
     this.checkForReconstruction();
+  }
+
+  // return the closest live point in a cluster
+  private Integer getClosestPoint(TreeMap<Integer, Integer> cluster, TreeMap<Float, Integer> sortedCluster) {
+
+    // get the closest points in sortedCluster
+    Integer x = sortedCluster.get(sortedCluster.firstKey());
+
+    while (!cluster.containsKey(x)) {
+
+      // remove this entry and get the next one
+      sortedCluster.pollFirstEntry();
+      x = sortedCluster.get(sortedCluster.firstKey());
+
+    }
+
+    return x;
   }
 
   // check whether some layer needs to be reconstructed
@@ -185,6 +207,7 @@ public class DynamicMP {
       this.layers.removeLast();
       this.samples.removeLast();
       this.clusters.removeLast();
+      this.sortedClusters.removeLast();
       this.reconTimer.removeLast();
     }
 
@@ -255,15 +278,20 @@ public class DynamicMP {
     @SuppressWarnings("unchecked")
     TreeMap<Integer, Integer>[] layerClustering = new TreeMap[m];
 
+    @SuppressWarnings("unchecked")
+    TreeMap<Float, Integer>[] layerSortedClustering = new TreeMap[m];
+
     TreeMap<Integer, Integer> newLayer = new TreeMap<Integer, Integer>();
 
     for (int i = 0; i < m; i++) {
       layerClustering[i] = new TreeMap<Integer, Integer>();
+      layerSortedClustering[i] = new TreeMap<Float, Integer>();
     }
 
     for (int i = 0; i < n; i++) {
       if (dist[i] <= nu) {
         layerClustering[assignment[i]].put(points[i], points[i]);
+        layerSortedClustering[assignment[i]].put(dist[i], points[i]);
         currentLayer.put(points[i], assignment[i]);
       }
       else {
@@ -278,6 +306,8 @@ public class DynamicMP {
     this.samples.add(layerSamples);
 
     this.clusters.add(layerClustering);
+
+    this.sortedClusters.add(layerSortedClustering);
 
     this.reconTimer.add((int)Math.ceil(n*this.tau));
   }
