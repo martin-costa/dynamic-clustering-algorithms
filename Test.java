@@ -9,19 +9,22 @@ import java.util.concurrent.TimeUnit;
 public class Test {
 
   // 'census' input path
-  private static String census = "../data/census_data";
+  private static String census = "census_data";
 
   // 'song' input path
-  private static String song = "../data/song";
+  private static String song = "song";
 
   // 'kddcup' input path
-  private static String kddcup = "../data/kddcup";
+  private static String kddcup = "kddcup";
 
   // main function to run tests
   public static void main(String[] args) throws IOException, InterruptedException {
 
+    // dataset
+    String dataset = args[0];
+
     // parameter k
-    int k = 50;
+    int k = Integer.parseInt(args[1]);
 
     // number of queries to perform over the stream
     int queryCount = 1000;
@@ -34,17 +37,17 @@ public class Test {
     Metric metric = new LpNorm(1);
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, song);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
 
     // the dynamic algorithms
     DynamicMP dynamicMP = new DynamicMP(k, metric, 15.0f, 0.85f, 0.2f);
     HenzingerTree henzingerTree = new HenzingerTree(k, metric, 1.0f);
 
-    runTest(updateStream, dynamicMP, henzingerTree, metric, k, queryCount, true, true);
+    runTest(updateStream, dynamicMP, henzingerTree, metric, k, dataset, queryCount, true, true);
   }
 
   // test and compare the dynamic algorithms
-  public static void runTest(SlidingWindow updateStream, DynamicMP dynamicMP, HenzingerTree henzingerTree, Metric metric, int k, int queryCount, boolean runMP, boolean runHK) throws IOException {
+  public static void runTest(SlidingWindow updateStream, DynamicMP dynamicMP, HenzingerTree henzingerTree, Metric metric, int k, String dataset, int queryCount, boolean runMP, boolean runHK) throws IOException {
 
     // query frequency
     int queryFrequency = (int)(updateStream.streamLength()/queryCount);
@@ -69,16 +72,16 @@ public class Test {
     KMeansPlusPlus kmeanspp = new KMeansPlusPlus(k, metric);
 
     // create an output streams to write data into file
-    DataOutputStream BCLPupdatetimeWriter = new DataOutputStream(new FileOutputStream("../results/BCLP_updatetime_" + Integer.toString(k)));
-    DataOutputStream HK20updatetimeWriter = new DataOutputStream(new FileOutputStream("../results/HK20_updatetime_" + Integer.toString(k)));
+    DataOutputStream BCLPupdatetimeWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_BCLP_updatetime_" + Integer.toString(k)));
+    DataOutputStream HK20updatetimeWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_HK20_updatetime_" + Integer.toString(k)));
 
-    DataOutputStream BCLPquerytimeWriter = new DataOutputStream(new FileOutputStream("../results/BCLP_querytime_" + Integer.toString(k)));
-    DataOutputStream HK20querytimeWriter = new DataOutputStream(new FileOutputStream("../results/HK20_querytime_" + Integer.toString(k)));
+    DataOutputStream BCLPquerytimeWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_BCLP_querytime_" + Integer.toString(k)));
+    DataOutputStream HK20querytimeWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_HK20_querytime_" + Integer.toString(k)));
 
-    DataOutputStream BCLPcostWriter = new DataOutputStream(new FileOutputStream("../results/BCLP_cost_" + Integer.toString(k)));
-    DataOutputStream HK20costWriter = new DataOutputStream(new FileOutputStream("../results/HK20_cost_" + Integer.toString(k)));
-    DataOutputStream MP03costWriter = new DataOutputStream(new FileOutputStream("../results/MP03_cost_" + Integer.toString(k)));
-    DataOutputStream kmeansppcostWriter = new DataOutputStream(new FileOutputStream("../results/kmeanspp_cost_" + Integer.toString(k)));
+    DataOutputStream BCLPcostWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_BCLP_cost_" + Integer.toString(k)));
+    DataOutputStream HK20costWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_HK20_cost_" + Integer.toString(k)));
+    DataOutputStream MP03costWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_MP03_cost_" + Integer.toString(k)));
+    DataOutputStream kmeansppcostWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_kmeanspp_cost_" + Integer.toString(k)));
 
     for (int i = 0; i < updateStream.streamLength(); i++) {
 

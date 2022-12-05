@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
 # loads a long from nanoseconds as a float in seconds
 def nano_to_seconds(n):
@@ -20,26 +21,92 @@ def load_file(path, f):
 
     return values
 
+# load data given the following parameters
+def load_data(dataset, k):
+
+    BCLP_update_times = load_file('../results/' + dataset + '_BCLP_updatetime_' + str(k), nano_to_seconds)
+    HK20_update_times = load_file('../results/' + dataset + '_HK20_updatetime_' + str(k), nano_to_seconds)
+
+    BCLP_query_times = load_file('../results/' + dataset + '_BCLP_querytime_' + str(k), nano_to_seconds)
+    HK20_query_times = load_file('../results/' + dataset + '_HK20_querytime_' + str(k), nano_to_seconds)
+
+    BCLP_cost = load_file('../results/' + dataset + '_BCLP_cost_' + str(k), float)
+    HK20_cost = load_file('../results/' + dataset + '_HK20_cost_' + str(k), float)
+    MP03_cost = load_file('../results/' + dataset + '_MP03_cost_' + str(k), float)
+    kmeanspp_cost = load_file('../results/' + dataset + '_kmeanspp_cost_' + str(k), float)
+
+    n = len(BCLP_update_times)
+    q = len(BCLP_query_times)
+
+    return n, q, [BCLP_update_times, HK20_update_times], [BCLP_query_times, HK20_query_times], [BCLP_cost, HK20_cost, MP03_cost, kmeanspp_cost]
+
+# create a plot for dataset and k
+def plot_data(dataset, k):
+
+    fig, axs = plt.subplots(1, 3)
+
+    data = load_data(dataset, k)
+
+    n = data[0]
+    q = data[1]
+
+    x_updates = np.linspace(1, n, n)
+    x_queries = np.linspace(1, n, q)
+
+    # update times
+    axs[0].plot(x_updates, data[2][0], 'b-', label='BCLP')
+    axs[0].plot(x_updates, data[2][1], 'r-', label='HK20')
+    axs[0].set_title('Total Update Time, k = ' + str(k))
+    axs[0].set(xlabel='Updates', ylabel='Total Update Time (sec)')
+    axs[0].legend();
+
+    # query times
+    axs[1].plot(x_queries, data[3][0], 'b-', label='BCLP')
+    axs[1].plot(x_queries, data[3][1], 'r-', label='HK20')
+    axs[1].set_title('Total Query Time, k = ' + str(k))
+    axs[1].set(xlabel='Updates', ylabel='Total Query Time (sec)')
+    axs[1].legend();
+
+    # costs
+    axs[2].plot(x_queries, data[4][0], 'b-', label='BCLP')
+    axs[2].plot(x_queries, data[4][1], 'r-', label='HK20')
+    axs[2].plot(x_queries, data[4][2], 'g-', label='MP03')
+    axs[2].plot(x_queries, data[4][3], 'c-', label='kmeans++')
+    axs[2].set_title('Cost of Solution, k = ' + str(k))
+    axs[2].set(xlabel='Updates', ylabel='Cost')
+    axs[2].legend();
+
+    plt.show()
+
+if __name__ == '__main__':
+
+    dataset, k = sys.argv[1], int(sys.argv[2])
+
+    plot_data(dataset, k)
+
+
+# plot_data('song', 50)
+
 # load in the files
-BCLP_update_times_50 = load_file("../results/BCLP_updatetime_50", nano_to_seconds)
-HK20_update_times_50 = load_file("../results/HK20_updatetime_50", nano_to_seconds)
+# BCLP_update_times_50 = load_file("../results/BCLP_updatetime_50", nano_to_seconds)
+# HK20_update_times_50 = load_file("../results/HK20_updatetime_50", nano_to_seconds)
+#
+# BCLP_query_times_50 = load_file("../results/BCLP_querytime_50", nano_to_seconds)
+# HK20_query_times_50 = load_file("../results/HK20_querytime_50", nano_to_seconds)
+#
+# BCLP_cost_50 = load_file("../results/BCLP_cost_50", float)
+# HK20_cost_50 = load_file("../results/HK20_cost_50", float)
+# MP03_cost_50 = load_file("../results/MP03_cost_50", float)
+# kmeanspp_cost_50 = load_file("../results/kmeanspp_cost_50", float)
 
-BCLP_query_times_50 = load_file("../results/BCLP_querytime_50", nano_to_seconds)
-HK20_query_times_50 = load_file("../results/HK20_querytime_50", nano_to_seconds)
-
-BCLP_cost_50 = load_file("../results/BCLP_cost_50", float)
-HK20_cost_50 = load_file("../results/HK20_cost_50", float)
-MP03_cost_50 = load_file("../results/MP03_cost_50", float)
-kmeanspp_cost_50 = load_file("../results/kmeanspp_cost_50", float)
-
-# number of updates
-n = len(BCLP_update_times_50)
-
-# query frequency
-q = len(BCLP_query_times_50)
-
-x_updates = np.linspace(1, n, n)
-x_queries = np.linspace(1, n, q)
+# # number of updates
+# n = len(BCLP_update_times_50)
+#
+# # query frequency
+# q = len(BCLP_query_times_50)
+#
+# x_updates = np.linspace(1, n, n)
+# x_queries = np.linspace(1, n, q)
 
 # initialise the arrays to store the values
 # BCLP_update_times_10 = [0]*n
@@ -128,28 +195,28 @@ x_queries = np.linspace(1, n, q)
 
 ##############################
 
-# create the plots
-fig, axs = plt.subplots(1, 3)
-
-# update times
-axs[0].plot(x_updates, HK20_update_times_50, 'r-', label='HK20')
-axs[0].plot(x_updates, BCLP_update_times_50, 'b-', label='BCLP')
-axs[0].set_title('Total Update Time, k = 50')
-axs[0].set(xlabel='Updates', ylabel='Total Update Time (sec)')
-axs[0].legend();
-
-axs[1].plot(x_queries, HK20_query_times_50, 'r-', label='HK20')
-axs[1].plot(x_queries, BCLP_query_times_50, 'b-', label='BCLP')
-axs[1].set_title('Total Query Time, k = 50')
-axs[1].set(xlabel='Updates', ylabel='Total Query Time (sec)')
-axs[1].legend();
-
-axs[2].plot(x_queries, HK20_cost_50, 'r-', label='HK20')
-axs[2].plot(x_queries, BCLP_cost_50, 'b-', label='BCLP')
-axs[2].plot(x_queries, MP03_cost_50, 'g-', label='MP03')
-axs[2].plot(x_queries, kmeanspp_cost_50, 'c-', label='kmeans++')
-axs[2].set_title('Cost of Solution, k = 50')
-axs[2].set(xlabel='Updates', ylabel='Cost')
-axs[2].legend();
-
-plt.show()
+# # create the plots
+# fig, axs = plt.subplots(1, 3)
+#
+# # update times
+# axs[0].plot(x_updates, HK20_update_times_50, 'r-', label='HK20')
+# axs[0].plot(x_updates, BCLP_update_times_50, 'b-', label='BCLP')
+# axs[0].set_title('Total Update Time, k = 50')
+# axs[0].set(xlabel='Updates', ylabel='Total Update Time (sec)')
+# axs[0].legend();
+#
+# axs[1].plot(x_queries, HK20_query_times_50, 'r-', label='HK20')
+# axs[1].plot(x_queries, BCLP_query_times_50, 'b-', label='BCLP')
+# axs[1].set_title('Total Query Time, k = 50')
+# axs[1].set(xlabel='Updates', ylabel='Total Query Time (sec)')
+# axs[1].legend();
+#
+# axs[2].plot(x_queries, HK20_cost_50, 'r-', label='HK20')
+# axs[2].plot(x_queries, BCLP_cost_50, 'b-', label='BCLP')
+# axs[2].plot(x_queries, MP03_cost_50, 'g-', label='MP03')
+# axs[2].plot(x_queries, kmeanspp_cost_50, 'c-', label='kmeans++')
+# axs[2].set_title('Cost of Solution, k = 50')
+# axs[2].set(xlabel='Updates', ylabel='Cost')
+# axs[2].legend();
+#
+# plt.show()
