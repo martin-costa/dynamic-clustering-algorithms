@@ -80,7 +80,7 @@ public class Test {
 
     DataOutputStream BCLPcostWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_BCLP_cost_" + Integer.toString(k)));
     DataOutputStream HK20costWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_HK20_cost_" + Integer.toString(k)));
-    DataOutputStream MP03costWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_MP03_cost_" + Integer.toString(k)));
+    // DataOutputStream MP03costWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_MP03_cost_" + Integer.toString(k)));
     DataOutputStream kmeansppcostWriter = new DataOutputStream(new FileOutputStream("../results/" + dataset + "_kmeanspp_cost_" + Integer.toString(k)));
 
     for (int i = 0; i < updateStream.streamLength(); i++) {
@@ -138,8 +138,8 @@ public class Test {
           henzingerCost = cost(activePoints, henzingerSolution, metric);
         }
 
-        // run static online k median
-        staticMPCost = cost(activePoints, onlineKMedian.cluster(activePoints), metric);
+        // // run static online k median
+        // staticMPCost = cost(activePoints, onlineKMedian.cluster(activePoints), metric);
 
         // run kmeans++
         kmeansppCost = cost(activePoints, kmeanspp.clusterUniform(activePoints), metric);
@@ -154,7 +154,6 @@ public class Test {
         HK20querytimeWriter.writeChars(Long.toString(queryTimeHK) + "#");
         BCLPcostWriter.writeChars(Float.toString(dynamicMPCost) + "#");
         HK20costWriter.writeChars(Float.toString(henzingerCost) + "#");
-        MP03costWriter.writeChars(Float.toString(staticMPCost) + "#");
         kmeansppcostWriter.writeChars(Float.toString(kmeansppCost) + "#");
       }
 
@@ -173,8 +172,6 @@ public class Test {
         System.out.println(dynamicMPCost);
         System.out.print("HK cost = ");
         System.out.println(henzingerCost);
-        System.out.print("static MP cost = ");
-        System.out.println(staticMPCost);
         System.out.print("kmeans++ cost = ");
         System.out.println(kmeansppCost);
       }
@@ -187,6 +184,7 @@ public class Test {
     HK20querytimeWriter.close();
     BCLPcostWriter.close();
     HK20costWriter.close();
+    kmeansppcostWriter.close();
   }
 
   // compute the cost of solution with respect points with this metric

@@ -32,13 +32,13 @@ def load_data(dataset, k):
 
     BCLP_cost = load_file('../results/' + dataset + '_BCLP_cost_' + str(k), float)
     HK20_cost = load_file('../results/' + dataset + '_HK20_cost_' + str(k), float)
-    MP03_cost = load_file('../results/' + dataset + '_MP03_cost_' + str(k), float)
+    # MP03_cost = load_file('../results/' + dataset + '_MP03_cost_' + str(k), float)
     kmeanspp_cost = load_file('../results/' + dataset + '_kmeanspp_cost_' + str(k), float)
 
     n = len(BCLP_update_times)
     q = len(BCLP_query_times)
 
-    return n, q, [BCLP_update_times, HK20_update_times], [BCLP_query_times, HK20_query_times], [BCLP_cost, HK20_cost, MP03_cost, kmeanspp_cost]
+    return n, q, [BCLP_update_times, HK20_update_times], [BCLP_query_times, HK20_query_times], [BCLP_cost, HK20_cost, kmeanspp_cost]
 
 # create a plot for dataset and k
 def plot_data(dataset, k):
@@ -70,8 +70,7 @@ def plot_data(dataset, k):
     # costs
     axs[2].plot(x_queries, data[4][0], 'b-', label='BCLP')
     axs[2].plot(x_queries, data[4][1], 'r-', label='HK20')
-    axs[2].plot(x_queries, data[4][2], 'g-', label='MP03')
-    axs[2].plot(x_queries, data[4][3], 'c-', label='kmeans++')
+    axs[2].plot(x_queries, data[4][2], 'c-', label='kmeans++')
     axs[2].set_title('Cost of Solution, k = ' + str(k))
     axs[2].set(xlabel='Updates', ylabel='Cost')
     axs[2].legend();
