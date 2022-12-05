@@ -131,7 +131,7 @@ public class Test {
         }
 
         // add the point to the collection of active points
-        activePoints.put(updateStream.key(i), updateStream.point(i));
+        activePoints.remove(updateStream.key(i));
       }
 
       // perform queries
@@ -169,23 +169,23 @@ public class Test {
       }
 
       // print
-      System.out.println("------------\n");
-      System.out.print("n = ");
-      System.out.print(i);
-      System.out.println("");
-      System.out.print("MP update time = ");
-      System.out.println(updateTimeMP*0.000000001);
-      System.out.print("HK update time = ");
-      System.out.println(updateTimeHK*0.000000001);
-      System.out.println("");
-      if (i % queryFrequency == 0) {
-        System.out.print("MP cost = ");
-        System.out.println(dynamicMPCost);
-        System.out.print("HK cost = ");
-        System.out.println(henzingerCost);
-        System.out.print("kmeans++ cost = ");
-        System.out.println(kmeansppCost);
-      }
+      // System.out.println("------------\n");
+      // System.out.print("n = ");
+      // System.out.print(i);
+      // System.out.println("");
+      // System.out.print("MP update time = ");
+      // System.out.println(updateTimeMP*0.000000001);
+      // System.out.print("HK update time = ");
+      // System.out.println(updateTimeHK*0.000000001);
+      // System.out.println("");
+      // if (i % queryFrequency == 0) {
+      //   System.out.print("MP cost = ");
+      //   System.out.println(dynamicMPCost);
+      //   System.out.print("HK cost = ");
+      //   System.out.println(henzingerCost);
+      //   System.out.print("kmeans++ cost = ");
+      //   System.out.println(kmeansppCost);
+      // }
     }
 
     // close the output streams

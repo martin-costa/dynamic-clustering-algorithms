@@ -143,10 +143,14 @@ public class HenzingerTree {
 
       n -= 1;
 
-      // if we have deleted the correct leaf
+      // if we have deleted the incorrect leaf
       if (deadLeaf.key() != key) {
         leafToReplace.replace(deadLeaf.key(), deadLeaf.point(), np, lambda(), epsilon());
         leafFinder.put(deadLeaf.key(), leafToReplace);
+      }
+
+      if (n == 1) {
+        root = leafFinder.get(leafFinder.firstKey());
       }
     }
 
@@ -437,7 +441,7 @@ class Leaf extends Node {
     // recompute the node to leaf path from leaf
     leaf.recomputeUpwards(n, lambda, epsilon);
 
-    return leaf;
+    return this;
   }
 
   // replace the point at this leaf
@@ -485,6 +489,6 @@ class Leaf extends Node {
 
   // PRINTING FOR DEBUGGING
   public void print() {
-    System.out.println(key);
+    System.out.print(key);
   }
 }
