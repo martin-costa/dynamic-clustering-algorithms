@@ -29,11 +29,11 @@ public class Test {
     // create un update stream of length n
     int n = 10000;
 
-    if (args.length > 2)
-      windowLength = Integer.parseInt(args[2]);
-
     // set the window length
     int windowLength = 1000;
+
+    if (args.length > 2)
+      windowLength = Integer.parseInt(args[2]);
 
     if (args.length > 3)
       n = Integer.parseInt(args[3]);
