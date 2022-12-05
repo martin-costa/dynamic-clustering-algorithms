@@ -43,8 +43,6 @@ def load_data(dataset, k):
 # create a plot for dataset and k
 def plot_data(dataset, k):
 
-    fig, axs = plt.subplots(1, 3)
-
     data = load_data(dataset, k)
 
     n = data[0]
@@ -53,27 +51,31 @@ def plot_data(dataset, k):
     x_updates = np.linspace(1, n, n)
     x_queries = np.linspace(1, n, q)
 
+    fig, axs = plt.subplots(1, 3, figsize=(12, 5))
+
     # update times
-    axs[0].plot(x_updates, data[2][0], 'b-', label='BCLP')
     axs[0].plot(x_updates, data[2][1], 'r-', label='HK20')
-    axs[0].set_title('Total Update Time, k = ' + str(k))
+    axs[0].plot(x_updates, data[2][0], 'b-', label='BCLP')
+    axs[0].set_title('Total Update Time')
     axs[0].set(xlabel='Updates', ylabel='Total Update Time (sec)')
     axs[0].legend();
 
     # query times
-    axs[1].plot(x_queries, data[3][0], 'b-', label='BCLP')
     axs[1].plot(x_queries, data[3][1], 'r-', label='HK20')
-    axs[1].set_title('Total Query Time, k = ' + str(k))
+    axs[1].plot(x_queries, data[3][0], 'b-', label='BCLP')
+    axs[1].set_title('Total Query Time')
     axs[1].set(xlabel='Updates', ylabel='Total Query Time (sec)')
     axs[1].legend();
 
     # costs
-    axs[2].plot(x_queries, data[4][0], 'b-', label='BCLP')
-    axs[2].plot(x_queries, data[4][1], 'r-', label='HK20')
     axs[2].plot(x_queries, data[4][2], 'c-', label='kmeans++')
-    axs[2].set_title('Cost of Solution, k = ' + str(k))
+    axs[2].plot(x_queries, data[4][1], 'r-', label='HK20')
+    axs[2].plot(x_queries, data[4][0], 'b-', label='BCLP')
+    axs[2].set_title('Cost of Solution')
     axs[2].set(xlabel='Updates', ylabel='Cost')
     axs[2].legend();
+
+    plt.suptitle(str(n) + ' Updates from the ' + dataset + ' Dataset, with k = ' + str(k))
 
     plt.show()
 
