@@ -21,7 +21,7 @@ public class Test {
   public static void main(String[] args) throws IOException, InterruptedException {
 
     // parameter k
-    int k = 10;
+    int k = 50;
 
     // number of queries to perform over the stream
     int queryCount = 1000;
@@ -34,10 +34,10 @@ public class Test {
     Metric metric = new LpNorm(1);
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, kddcup);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, song);
 
     // the dynamic algorithms
-    DynamicMP dynamicMP = new DynamicMP(k, metric, 10.0f, 0.85f, 0.2f);
+    DynamicMP dynamicMP = new DynamicMP(k, metric, 15.0f, 0.85f, 0.2f);
     HenzingerTree henzingerTree = new HenzingerTree(k, metric, 1.0f);
 
     runTest(updateStream, dynamicMP, henzingerTree, metric, k, queryCount, true, true);

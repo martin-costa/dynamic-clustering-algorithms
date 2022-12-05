@@ -191,7 +191,7 @@ public class HenzingerTree {
     //System.out.println(inPoints.size());
 
     // run the outercore
-    outercore.construct(inPoints, inWeights, 1/(((float)Math.log(np + 1) + 1)), epsilon);
+    outercore.construct(inPoints, inWeights, 1.0f/(n + 1), epsilon);
 
     //System.out.println(outercore.getPoints().size());
 
@@ -210,12 +210,12 @@ public class HenzingerTree {
 
   // the parameter lambda for inner ALG instances
   private float lambda() {
-    return 1.0f/(2*((float)Math.log(np + 1) + 1)*np);
+    return 1.0f/(2.0f*(np*np + 1));
   }
 
   // the paramter epsilon for inner ALG instances
   private float epsilon() {
-    return this.epsilon/(6*(float)Math.log(np));
+    return this.epsilon/(6.0f*(float)Math.log(np));
   }
 
   // returns the points computed by the tree
