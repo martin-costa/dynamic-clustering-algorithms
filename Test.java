@@ -26,20 +26,23 @@ public class Test {
     // parameter k
     int k = Integer.parseInt(args[1]);
 
-    // number of queries to perform over the stream
-    int queryCount = 1000;
-
     // create un update stream of length n
     int n = 10000;
+
+    if (args.length > 2)
+      windowLength = Integer.parseInt(args[2]);
+
+    // set the window length
     int windowLength = 1000;
 
-    if (args.length > 2) {
-      windowLength = Integer.parseInt(args[2]);
-    }
-
-    if (args.length > 3) {
+    if (args.length > 3)
       n = Integer.parseInt(args[3]);
-    }
+
+    // number of queries to perform over the stream
+    int queryCount = (int)(n / 10);
+
+    if (args.length > 4)
+      queryCount = Integer.parseInt(args[4]);
 
     // the metric to be used
     Metric metric = new LpNorm(1);
