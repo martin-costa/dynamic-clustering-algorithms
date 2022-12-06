@@ -51,7 +51,7 @@ public class Test {
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
 
     // the dynamic algorithms
-    DynamicMP dynamicMP = new DynamicMP(k, metric, 15.0f, 0.85f, 0.2f);
+    DynamicMP dynamicMP = new DynamicMP(k, metric, 30.0f, 0.85f, 0.2f);
     HenzingerTree henzingerTree = new HenzingerTree(k, metric, 1.0f);
 
     runTest(updateStream, dynamicMP, henzingerTree, metric, k, dataset, queryCount, true, true);
