@@ -192,15 +192,15 @@ public class HenzingerTree {
     TreeMap<Integer, float[]> inPoints = root.getPoints();
     TreeMap<Integer, Float> inWeights = root.getWeights();
 
-    //System.out.println(inPoints.size());
-
     // run the outercore
     outercore.construct(inPoints, inWeights, 1.0f/(n + 1), epsilon);
 
-    //System.out.println(outercore.getPoints().size());
-
     outPoints = outercore.getPoints();
     outWeights = outercore.getWeights();
+
+    if (outercore.size() == 0) {
+      System.out.println("ERROR");
+    }
   }
 
   // cluster the points in the corset
