@@ -69,7 +69,7 @@ public class CoresetBFL {
 
     int m = (int)(m1*m2);
 
-    m = (int)(15*k*Math.log(n/k));
+    m = 1000;
 
     // if there aren't enough points
     if (n < m) {

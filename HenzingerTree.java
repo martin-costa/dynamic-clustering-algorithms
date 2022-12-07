@@ -197,10 +197,6 @@ public class HenzingerTree {
 
     outPoints = outercore.getPoints();
     outWeights = outercore.getWeights();
-
-    if (outercore.size() == 0) {
-      System.out.println("ERROR");
-    }
   }
 
   // cluster the points in the corset
