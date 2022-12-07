@@ -197,8 +197,6 @@ public class OnlineKMedian {
         j = 0;
     }
 
-
-
     // next median is i
     return i;
   }
@@ -232,7 +230,7 @@ public class OnlineKMedian {
     Pair ball = new Pair(-1, 0.0f);
 
     // the value of ball
-    float bestValue = 0;
+    float bestValue = -Float.POSITIVE_INFINITY;
 
     for (Integer j : nonMedians) {
 
