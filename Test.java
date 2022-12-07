@@ -30,7 +30,7 @@ public class Test {
     int n = 10000;
 
     // set the window length
-    int windowLength = 1000;
+    int windowLength = 2000;
 
     if (args.length > 2)
       windowLength = Integer.parseInt(args[2]);
@@ -45,13 +45,13 @@ public class Test {
       queryCount = Integer.parseInt(args[4]);
 
     // the metric to be used
-    Metric metric = new LpNorm(1);
+    Metric metric = new LpNorm(2, 1.0f/n);
 
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
 
     // the dynamic algorithms
-    DynamicMP dynamicMP = new DynamicMP(k, metric, 30.0f, 0.85f, 0.2f);
+    DynamicMP dynamicMP = new DynamicMP(k, metric, 15.0f, 0.85f, 0.2f);
     HenzingerTree henzingerTree = new HenzingerTree(k, metric, 1.0f);
 
     runTest(updateStream, dynamicMP, henzingerTree, metric, k, dataset, queryCount, true, true);

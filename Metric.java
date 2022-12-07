@@ -13,8 +13,16 @@ class LpNorm extends Metric {
 
   private int p;
 
+  private float noise;
+
+  LpNorm(int p, float noise) {
+    this.p = p;
+    this.noise = noise;
+  }
+
   LpNorm(int p) {
     this.p = p;
+    this.noise = 0;
   }
 
   public float d(float[] x, float[] y) {
@@ -29,6 +37,7 @@ class LpNorm extends Metric {
       sum += Math.pow(Math.abs(x[i] - y[i]), p);
     }
 
-    return (float)Math.pow(sum, 1.0/(double)p);
+    float d = (float)Math.pow(sum, 1.0/(double)p);
+    return d + noise;
   }
 }

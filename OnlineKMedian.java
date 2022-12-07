@@ -197,6 +197,8 @@ public class OnlineKMedian {
         j = 0;
     }
 
+
+
     // next median is i
     return i;
   }
@@ -208,7 +210,7 @@ public class OnlineKMedian {
     Pair ball = new Pair(-1, 0.0f);
 
     // the value of ball
-    float bestValue = 0;
+    float bestValue = -Float.POSITIVE_INFINITY;
 
     for (int j = 0; j <= l; j++) {
 
@@ -264,6 +266,9 @@ public class OnlineKMedian {
     int j = Arrays.binarySearch(sortedPointsDistArr[i], r);
 
     if (j < 0) j = -j-2;
+
+    // FOR NOISE
+    if (j < 0) j = 0;
 
     return r*ballValueAux1[i][j] - ballValueAux2[i][j];
   }
