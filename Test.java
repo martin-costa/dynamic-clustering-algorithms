@@ -58,11 +58,11 @@ public class Test {
 
     HenzingerTree henzingerTree = new HenzingerTree(k, metric, 1.0f);
 
-    runTest(updateStream, dynamicMP, henzingerTree, metric, k, dataset, queryCount, true, true);
+    runTest(updateStream, dynamicMP, henzingerTree, metric, k, dataset, queryCount);
   }
 
   // test and compare the dynamic algorithms
-  public static void runTest(SlidingWindow updateStream, DynamicMP dynamicMP, HenzingerTree henzingerTree, Metric metric, int k, String dataset, int queryCount, boolean runMP, boolean runHK) throws IOException {
+  public static void runTest(SlidingWindow updateStream, DynamicMP dynamicMP, HenzingerTree henzingerTree, Metric metric, int k, String dataset, int queryCount) throws IOException {
 
     // query frequency
     int queryFrequency = (int)(updateStream.streamLength()/queryCount);
@@ -104,16 +104,13 @@ public class Test {
       if (updateStream.updateType(i)) {
 
         // run and time the updates for each
-        if (runMP) {
-          long s = System.nanoTime();
-          dynamicMP.insert(updateStream.key(i), updateStream.point(i));
-          updateTimeMP += System.nanoTime() - s;
-        }
-        if (runHK) {
-          long s = System.nanoTime();
-          henzingerTree.insert(updateStream.key(i), updateStream.point(i));
-          updateTimeHK += System.nanoTime() - s;
-        }
+        long s = System.nanoTime();
+        dynamicMP.insert(updateStream.key(i), updateStream.point(i));
+        updateTimeMP += System.nanoTime() - s;
+
+        s = System.nanoTime();
+        henzingerTree.insert(updateStream.key(i), updateStream.point(i));
+        updateTimeHK += System.nanoTime() - s;
 
         // add the point to the collection of active points
         activePoints.put(updateStream.key(i), updateStream.point(i));
@@ -123,16 +120,13 @@ public class Test {
       else {
 
         // run and time the updates for each
-        if (runMP) {
-          long s = System.nanoTime();
-          dynamicMP.delete(updateStream.key(i));
-          updateTimeMP += System.nanoTime() - s;
-        }
-        if (runHK) {
-          long s = System.nanoTime();
-          henzingerTree.delete(updateStream.key(i));
-          updateTimeHK += System.nanoTime() - s;
-        }
+        long s = System.nanoTime();
+        dynamicMP.delete(updateStream.key(i));
+        updateTimeMP += System.nanoTime() - s;
+
+        s = System.nanoTime();
+        henzingerTree.delete(updateStream.key(i));
+        updateTimeHK += System.nanoTime() - s;
 
         // add the point to the collection of active points
         activePoints.remove(updateStream.key(i));
@@ -140,21 +134,16 @@ public class Test {
 
       // perform queries
       if (i % queryFrequency == 0) {
-        if (runMP) {
-          long s = System.nanoTime();
-          TreeMap<Integer, Integer> dynamicMPSolution = dynamicMP.cluster();
-          queryTimeMP += System.nanoTime() - s;
-          dynamicMPCost = cost(activePoints, dynamicMPSolution, metric);
-        }
-        if (runHK) {
-          long s = System.nanoTime();
-          TreeMap<Integer, Integer> henzingerSolution = henzingerTree.cluster();
-          queryTimeHK += System.nanoTime() - s;
-          henzingerCost = cost(activePoints, henzingerSolution, metric);
-        }
 
-        // // run static online k median
-        // staticMPCost = cost(activePoints, onlineKMedian.cluster(activePoints), metric);
+        long s = System.nanoTime();
+        TreeMap<Integer, Integer> dynamicMPSolution = dynamicMP.cluster();
+        queryTimeMP += System.nanoTime() - s;
+        dynamicMPCost = cost(activePoints, dynamicMPSolution, metric);
+
+        s = System.nanoTime();
+        TreeMap<Integer, Integer> henzingerSolution = henzingerTree.cluster();
+        queryTimeHK += System.nanoTime() - s;
+        henzingerCost = cost(activePoints, henzingerSolution, metric);
 
         // run kmeans++
         kmeansppCost = cost(activePoints, kmeanspp.clusterUniform(activePoints), metric);
@@ -175,21 +164,7 @@ public class Test {
       // print
       // System.out.println("------------\n");
       System.out.print("n = ");
-      System.out.print(i);
-      System.out.println("");
-      // System.out.print("MP update time = ");
-      // System.out.println(updateTimeMP*0.000000001);
-      // System.out.print("HK update time = ");
-      // System.out.println(updateTimeHK*0.000000001);
-      // System.out.println("");
-      // if (i % queryFrequency == 0) {
-      //   System.out.print("MP cost = ");
-      //   System.out.println(dynamicMPCost);
-      //   System.out.print("HK cost = ");
-      //   System.out.println(henzingerCost);
-      //   System.out.print("kmeans++ cost = ");
-      //   System.out.println(kmeansppCost);
-      // }
+      System.out.println(i);
     }
 
     // close the output streams
@@ -201,6 +176,9 @@ public class Test {
     HK20costWriter.close();
     kmeansppcostWriter.close();
   }
+
+  // run tests on many algorithmss
+  // public static void runTests(DynamicMP[] ourAlgorithms, HenzingerTree[] henzingerTrees,  )
 
   // compute the cost of solution with respect points with this metric
   public static float cost(TreeMap<Integer, float[]> points, TreeMap<Integer, Integer> solution, Metric metric) {

@@ -10,13 +10,10 @@ an implementation of the kmeans++ algorithm
 class KMeansPlusPlus {
 
   // the points that we want to cluster
-  private float[][] points;
+  private TreeMap<Integer, float[]> points;
 
   // the weights of the points to be clustered
-  private float[] weights;
-
-  // the keys of the points to be clustered
-  private int[] keys;
+  private TreeMap<Integer, Float> weights;
 
   // the metric
   private Metric metric;
@@ -34,7 +31,7 @@ class KMeansPlusPlus {
   private int iterations;
 
   // the clusters we want to find
-  private int[][] clusters;
+  private TreeMap<Integer, Integer>[] clusters;
 
   // the centers of these clusters
   private int[] clusterCenters;
@@ -51,8 +48,6 @@ class KMeansPlusPlus {
     this.k = k;
     this.iterations = 2;
   }
-
-  // METHODS TO CALL THE CLUSTERING
 
   public TreeMap<Integer, Integer> clusterUniform(TreeMap<Integer, float[]> points, TreeMap<Integer, Integer> startingConfig) {
 
@@ -72,59 +67,18 @@ class KMeansPlusPlus {
     return clusterUniform(points, null);
   }
 
-  public TreeMap<Integer, Integer> cluster(TreeMap<Integer, float[]> points, TreeMap<Integer, Float> weights) {
-    return cluster(points, weights, null);
-  }
-
   public TreeMap<Integer, Integer> cluster(TreeMap<Integer, float[]> points, TreeMap<Integer, Float> weights, TreeMap<Integer, Integer> startingConfig) {
-
-    float[][] pointsArr = new float[points.size()][];
-    float[] weightsArr = new float[points.size()];
-    int[] keysArr = new int[points.size()];
-
-    int n = points.size();
-
-    Integer[] tempKeys = points.keySet().toArray(new Integer[0]);
-
-    for (int i = 0; i < n; i++) {
-      pointsArr[i] = points.get(tempKeys[i]);
-      weightsArr[i] = weights.get(tempKeys[i]);
-      keysArr[i] = tempKeys[i];
-    }
-
-    float[][] startingConfigArr = null;
-
-    if (startingConfig != null) {
-
-      startingConfigArr = new float[startingConfig.size()][];
-
-      tempKeys = startingConfig.keySet().toArray(new Integer[0]);
-
-      for (int i = 0; i < startingConfigArr.length; i++) {
-        startingConfigArr[i] = points.get(tempKeys[i]);
-      }
-    }
-
-    return cluster(pointsArr, weightsArr, keysArr, startingConfigArr);
-  }
-
-  public TreeMap<Integer, Integer> cluster(float[][] points, float[] weights, int[] keys) {
-    return cluster(points, weights, keys, null);
-  }
-
-  public TreeMap<Integer, Integer> cluster(float[][] points, float[] weights, int[] keys, float[][] startingConfig) {
 
     // set the points and the weights
     this.points = points;
     this.weights = weights;
-    this.keys = keys;
 
     // the number of points
-    this.n = points.length;
+    this.n = points.size();
 
     // set the dimension of the data
     if (this.n > 0) {
-      this.d = points[0].length;
+      this.d = points.get(points.firstKey()).length;
     }
     else {
       return new TreeMap<Integer, Integer>();
@@ -133,32 +87,42 @@ class KMeansPlusPlus {
     return kmeansplusplus(iterations, startingConfig);
   }
 
-  /*
-
-  IMPLEMENTATION
-
-  */
-
-  // run using the seeding
-  public TreeMap<Integer, Integer> kmeansplusplus(int iterations) {
-    return kmeansplusplus(iterations, null);
+  public TreeMap<Integer, Integer> cluster(TreeMap<Integer, float[]> points, TreeMap<Integer, Float> weights) {
+    return cluster(points, weights, null);
   }
 
   // implementation of bicriteria approximation using kmeans++
-  public TreeMap<Integer, Integer> kmeansplusplus(int iterations, float[][] startingConfig) {
+  public TreeMap<Integer, Integer> kmeansplusplus(int iterations, TreeMap<Integer, Integer> startingConfig) {
 
     // if we have at most k points return each point as a center
     if (n <= k) {
       return returnAll();
     }
 
+    // create the treemaps that define the clusters
+    @SuppressWarnings("unchecked")
+    TreeMap<Integer, Integer>[] clusterMaps = new TreeMap[k];
+
+    this.clusters = clusterMaps;
+
     if (startingConfig == null) {
       // seed good starting centers and create clusters
       seedStartingCenters();
     }
     else {
+
+      // get the points corresponding to the init config.
+      float[][] startingConfigPoints = new float[k][d];
+      Integer[] startingConfigArr = startingConfig.keySet().toArray(new Integer[0]);
+
+      int i = 0;
+      for (Integer key : startingConfigArr) {
+        startingConfigPoints[i] = points.get(key);
+        i++;
+      }
+
       // create the initial clusters
-      createClusters(startingConfig);
+      createClusters(startingConfigPoints);
     }
 
     // run k iterations of kmeans
@@ -167,10 +131,19 @@ class KMeansPlusPlus {
     return createSolution();
   }
 
+  // run using the seeding
+  public TreeMap<Integer, Integer> kmeansplusplus(int iterations) {
+    return kmeansplusplus(iterations, null);
+  }
+
   // create a trivial solution if n is too small
   private TreeMap<Integer, Integer > returnAll() {
 
-    this.clusters = new int[n][1];
+    // create the treemaps that define the clusters
+    @SuppressWarnings("unchecked")
+    TreeMap<Integer, Integer>[] clusterMaps = new TreeMap[n];
+
+    this.clusters = clusterMaps;
 
     // create the clusters and centers
     this.clusterCenters = new int[n];
@@ -178,11 +151,14 @@ class KMeansPlusPlus {
     // create solution
     TreeMap<Integer, Integer> solution = new TreeMap<Integer, Integer>();
 
+    Integer[] pointsArr = points.keySet().toArray(new Integer[0]);
+
     int i = 0;
-    for (int key : keys) {
+    for (Integer key : pointsArr) {
       solution.put(key, key);
-      this.clusters[i][0] = i;
-      this.clusterCenters[i] = i;
+      this.clusters[i] = new TreeMap<Integer, Integer>();
+      this.clusters[i].put(key, key);
+      this.clusterCenters[i] = key;
       i++;
     }
     return solution;
@@ -191,18 +167,29 @@ class KMeansPlusPlus {
   // find a good starting point for kmeans
   private void seedStartingCenters() {
 
+    // get an array of the keys of all the points
+    Integer[] pointsArr = points.keySet().toArray(new Integer[0]);
+
+    // get an array of the keys of all the points
+    float[] weightsArr = new float[n];
+
+    // distances from samples points
+    float[] dist = new float[n];
+    Arrays.fill(dist, Float.POSITIVE_INFINITY);
+
     // total weight of points
     float totalWeight = 0;
 
     for (int i = 0; i < n; i++) {
-      totalWeight += weights[i];
+      weightsArr[i] = weights.get(pointsArr[i]);
+      totalWeight += weightsArr[i];
     }
 
     // create array with sampling probabilities
     float[] probs = new float[n];
 
     for (int i = 0; i < n; i++) {
-      probs[i] = weights[i]/totalWeight;
+      probs[i] = weightsArr[i]/totalWeight;
     }
 
     // create random number generator
@@ -211,7 +198,7 @@ class KMeansPlusPlus {
     float[][] samplePoints = new float[k][d];
 
     for (int i = 0; i < k; i++) {
-      samplePoints[i] = points[dSquaredWeighting(rng, probs)];
+      samplePoints[i] = points.get(pointsArr[dSquaredWeighting(rng, probs, dist, pointsArr, weightsArr)]);
     }
 
     // create the initial clusters
@@ -223,17 +210,19 @@ class KMeansPlusPlus {
 
     float[] centerOfMass = clusterCenterOfMass(i);
 
-    if (clusters[i].length == 0) {
-      return 0;
+    Integer[] clusterPoints = clusters[i].keySet().toArray(new Integer[0]);
+
+    if (clusterPoints.length == 0) {
+      return points.firstKey();
     }
 
-    int closestPoint = clusters[i][0];
+    int closestPoint = clusterPoints[0];
     float dist = Float.POSITIVE_INFINITY;
 
-    for (int j : clusters[i]) {
-      float d = metric.d(points[j], centerOfMass);
+    for (Integer key : clusterPoints) {
+      float d = metric.d(points.get(key), centerOfMass);
       if (d < dist) {
-        closestPoint = j;
+        closestPoint = key;
         dist = d;
       }
     }
@@ -242,11 +231,7 @@ class KMeansPlusPlus {
   }
 
   // sample a point according to D^2 weighting
-  private int dSquaredWeighting(Random rng, float[] probs) {
-
-    // distances from samples points
-    float[] dist = new float[n];
-    Arrays.fill(dist, Float.POSITIVE_INFINITY);
+  private int dSquaredWeighting(Random rng, float[] probs, float[] dist, Integer[] pointsArr, float[] weightsArr) {
 
     float r = rng.nextFloat();
     float s = 0;
@@ -266,8 +251,8 @@ class KMeansPlusPlus {
     float totalDSquared = 0;
 
     for (int i = 0; i < n; i++) {
-      dist[i] = Math.min(dist[i], metric.d(points[i], points[sample]));
-      totalDSquared += weights[i]*dist[i]*dist[i];
+      dist[i] = Math.min(dist[i], metric.d(points.get(pointsArr[i]), points.get(pointsArr[sample])));
+      totalDSquared += weightsArr[i]*dist[i]*dist[i];
     }
 
     // if every points is already at a point thats been sampled
@@ -280,7 +265,7 @@ class KMeansPlusPlus {
     }
 
     for (int i = 0; i < n; i++) {
-      probs[i] = weights[i]*dist[i]*dist[i]/totalDSquared;
+      probs[i] = weightsArr[i]*dist[i]*dist[i]/totalDSquared;
     }
 
     return sample;
@@ -314,13 +299,13 @@ class KMeansPlusPlus {
   // given the new centers create the clusters
   private void createClusters(float[][] newCenters) {
 
-    @SuppressWarnings("unchecked")
-    ArrayList[] tempClusters = new ArrayList[k];
-
     // reset the clusters
     for (int i = 0; i < k; i++) {
-      tempClusters[i] = new ArrayList<Integer>();
+      clusters[i] = new TreeMap<Integer, Integer>();
     }
+
+    // get an array of the keys of all the points
+    Integer[] pointsArr = points.keySet().toArray(new Integer[0]);
 
     // re-allocate points to clusters
     for (int i = 0; i < n; i++) {
@@ -330,7 +315,7 @@ class KMeansPlusPlus {
 
       for (int j = 0; j < k; j++) {
 
-        float d = metric.d(newCenters[j], points[i]);
+        float d = metric.d(newCenters[j], points.get(pointsArr[i]));
 
         // is point is closer to cluster center j than l
         if (d < dist) {
@@ -340,17 +325,7 @@ class KMeansPlusPlus {
       }
 
       // place point in cluster l
-      tempClusters[l].add(i);
-    }
-
-    clusters = new int[k][];
-
-    for (int i = 0; i < k; i++) {
-      clusters[i] = new int[tempClusters[i].size()];
-
-      for (int j = 0; j < clusters[i].length; j++) {
-        clusters[i][j] = (int)(tempClusters[i].get(j));
-      }
+      clusters[l].put(pointsArr[i], pointsArr[i]);
     }
   }
 
@@ -361,16 +336,16 @@ class KMeansPlusPlus {
     float[] center = new float[d];
 
     // the points in the cluster
-    int[] cluster = clusters[i];
+    Integer[] cluster = clusters[i].keySet().toArray(new Integer[0]);
 
     // total weight of points in this cluster
     float totalWeight = 0;
 
-    for (int p : cluster) {
+    for (Integer p : cluster) {
 
       // get the point and its weight
-      float[] x = points[p];
-      float w = weights[p];
+      float[] x = points.get(p);
+      float w = weights.get(p);
 
       totalWeight += w;
 
@@ -396,7 +371,7 @@ class KMeansPlusPlus {
 
     for (int i = 0; i < k; i++) {
       int p = getClusterCenter(i);
-      solution.put(keys[p], keys[p]);
+      solution.put(p, p);
       this.clusterCenters[i] = p;
     }
 
@@ -404,7 +379,7 @@ class KMeansPlusPlus {
   }
 
   // get the clusters
-  public int[][] getClusters() {
+  public TreeMap<Integer, Integer>[] getClusters() {
     return clusters;
   }
 

@@ -25,18 +25,18 @@ public class CoresetBFL {
   private float beta;
 
   // store the (alpha, beta)-approximation
-  private int[][] clusters;
+  private TreeMap<Integer, Integer>[] clusters;
   private int[] clusterCenters;
 
   // the input points we compute a coreset on
-  private float[][] points;
-  private float[] weights;
-  private int[] keys;
+  private TreeMap<Integer, float[]> points;
+
+  private TreeMap<Integer, Float> weights;
 
   // the coreset we compute
-  private float[][] outPoints;
-  private float[] outWeights;
-  private int[] outKeys;
+  private TreeMap<Integer, float[]> outPoints;
+
+  private TreeMap<Integer, Float> outWeights;
 
   public CoresetBFL(int k, Metric metric, float rho) {
     this.k = k;
@@ -53,13 +53,12 @@ public class CoresetBFL {
 
   // returns an epsilon-coreset given a weighted set (P, w) of a rho-metric space
   // and an (alpha, beta)-approximation P --> B
-  public void construct(float[][] points, float[] weights, int[] keys, float lambda, float epsilon) {
+  public void construct(TreeMap<Integer, float[]> points, TreeMap<Integer, Float> weights, float lambda, float epsilon) {
 
     this.points = points;
     this.weights = weights;
-    this.keys = keys;
 
-    int n = this.points.length;
+    int n = this.points.size();
 
     // compute the coreset
     float t = (float)Math.max(1, Math.log(k)/10);
@@ -76,7 +75,6 @@ public class CoresetBFL {
     if (n < m) {
       outPoints = points;
       outWeights = weights;
-      outKeys = keys;
       return;
     }
 
@@ -90,7 +88,14 @@ public class CoresetBFL {
   // constructs the coreset with m samples
   private void coreset(int m) {
 
-    int n = this.points.length;
+    int n = this.points.size();
+
+    // create arrays of point keys for each cluster
+    Integer[][] clusterArrays = new Integer[k][];
+
+    for (int i = 0; i < k; i++) {
+      clusterArrays[i] = clusters[i].keySet().toArray(new Integer[0]);
+    }
 
     // arrays of total weight per cluster
     float[] clusterWeights = new float[k];
@@ -100,9 +105,9 @@ public class CoresetBFL {
 
     for (int i = 0; i < k; i++) {
       clusterWeights[i] = 0;
-      for (int j = 0; j < clusters[i].length; j++) {
-        clusterWeights[i] += weights[clusters[i][j]];
-        v += weights[clusters[i][j]]*metric.d(points[clusters[i][j]], points[clusterCenters[i]]);
+      for (int j = 0; j < clusterArrays[i].length; j++) {
+        clusterWeights[i] += weights.get(clusterArrays[i][j]);
+        v += weights.get(clusterArrays[i][j])*metric.d(points.get(clusterArrays[i][j]), points.get(clusterCenters[i]));
       }
     }
 
@@ -110,21 +115,20 @@ public class CoresetBFL {
     float[][] prob = new float[k][];
 
     for (int i = 0; i < k; i++) {
-      prob[i] = new float[clusters[i].length];
+      prob[i] = new float[clusterArrays[i].length];
       for (int j = 0; j < prob[i].length; j++) {
-        prob[i][j] = 0.5f*weights[clusters[i][j]]*metric.d(points[clusters[i][j]], points[clusterCenters[i]])/v;
-        prob[i][j] += 0.5f*weights[clusters[i][j]]/(k*clusterWeights[i]);
+        prob[i][j] = 0.5f*weights.get(clusterArrays[i][j])*metric.d(points.get(clusterArrays[i][j]), points.get(clusterCenters[i]))/v;
+        prob[i][j] += 0.5f*weights.get(clusterArrays[i][j])/(k*clusterWeights[i]);
       }
     }
 
-    samplePoints(m, prob);
+    samplePoints(m, prob, clusterArrays);
   }
 
-  public void samplePoints(int m, float[][] prob) {
+  public void samplePoints(int m, float[][] prob, Integer[][] clusterArrays) {
 
-    ArrayList<float[]> tempOutPoints = new ArrayList<float[]>();
-    ArrayList<Float> tempOutWeights = new ArrayList<Float>();
-     ArrayList<Integer> tempOutKeys = new ArrayList<Integer>();
+    outPoints = new TreeMap<Integer, float[]>();
+    outWeights = new TreeMap<Integer, Float>();
 
     Random rng = new Random();
 
@@ -143,10 +147,9 @@ public class CoresetBFL {
 
           t += prob[i][j];
           if (r <= t) {
-            int idx = clusters[i][j];
-            tempOutPoints.add(points[idx]);
-            tempOutWeights.add(weights[idx]/(m*prob[i][j]));
-            tempOutKeys.add(keys[idx]);
+            int key = clusterArrays[i][j];
+            outPoints.put(key, points.get(key));
+            outWeights.put(key, weights.get(key)/(m*prob[i][j]));
 
             // break from loop
             j = len;
@@ -155,43 +158,26 @@ public class CoresetBFL {
         }
       }
     }
-
-    int s = tempOutPoints.size();
-
-    outPoints = new float[s][];
-    outWeights = new float[s];
-    outKeys = new int[s];
-
-    for (int i = 0; i < s; i++) {
-      outPoints[i] = tempOutPoints.get(i);
-      outWeights[i] = tempOutWeights.get(i);
-      outKeys[i] = tempOutKeys.get(i);
-    }
   }
 
   // computes an (alpha, beta)-approximation using kmeans++
   public void approximate() {
 
     // compute the (alpha beta)-approximation
-    kmeanspp.cluster(points, weights, keys);
+    kmeanspp.cluster(points, weights);
 
     clusters = kmeanspp.getClusters();
     clusterCenters = kmeanspp.getClusterCenters();
   }
 
   // returns the points computed by the coreset
-  public float[][] getPoints() {
+  public TreeMap<Integer, float[]> getPoints() {
     return outPoints;
   }
 
   // returns the weights computed by the coreset
-  public float[] getWeights() {
+  public TreeMap<Integer, Float> getWeights() {
     return outWeights;
-  }
-
-  // returns keys
-  public int[] getKeys() {
-    return outKeys;
   }
 
 

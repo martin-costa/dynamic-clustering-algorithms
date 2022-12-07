@@ -112,11 +112,34 @@ public class OnlineKMedian {
     // get the clustering
     TreeMap<Integer, Integer> solution = cluster();
 
-    return solution;
+    // // perform 2 iterations of Lloyd's and return
+    KMeansPlusPlus kmeanspp = new KMeansPlusPlus(k, metric);
+    return kmeanspp.cluster(points, weights, solution);
+  }
+
+  // given a weighted metric space, find a k clustering of the points
+  public TreeMap<Integer, Integer> cluster(float[][] points, float[] weights, int[] keys) {
+
+    // the number of points in the input
+    this.n = points.length;
+
+    // create the auxiliary data structures
+    setUpDataStructures(points, weights, keys);
+
+    // get the clustering
+    TreeMap<Integer, Integer> solution = cluster();
+
+    this.points = new TreeMap<Integer, float[]>();
+    this.weights = new TreeMap<Integer, Float>();
+
+    for (int i = 0; i < n; i++) {
+      this.points.put(keys[i], points[i]);
+      this.weights.put(keys[i], weights[i]);
+    }
 
     // // perform 2 iterations of Lloyd's and return
-    // KMeansPlusPlus kmeanspp = new KMeansPlusPlus(k, metric);
-    // return kmeanspp.cluster(points, weights, solution);
+    KMeansPlusPlus kmeanspp = new KMeansPlusPlus(k, metric);
+    return kmeanspp.cluster(this.points, this.weights, solution);
   }
 
   // implementation of online k-median algorithm
@@ -273,27 +296,43 @@ public class OnlineKMedian {
     return r*ballValueAux1[i][j] - ballValueAux2[i][j];
   }
 
-  // set up the data structures needed to solve the problem efficiently
   private void setUpDataStructures() {
+    setUpDataStructures(null, null, null);
+  }
+
+  // set up the data structures needed to solve the problem efficiently
+  private void setUpDataStructures(float[][] points, float[] weights, int[] keys) {
 
     // end if the input is empty
     if (n <= 0) return;
 
-    // place the keys of the points into an array
-    keysArr = points.keySet().toArray(new Integer[0]);
+    if (points == null) {
 
-    // the dimension of the data
-    int d = points.get(keysArr[0]).length;
+      // place the keys of the points into an array
+      keysArr = this.points.keySet().toArray(new Integer[0]);
 
-    // create an array to store the points
-    pointsArr = new float[n][d];
+      // the dimension of the data
+      int d = this.points.get(keysArr[0]).length;
 
-    // create an array to store the weights
-    weightsArr = new float[n];
+      // create an array to store the points
+      pointsArr = new float[n][d];
 
-    for (int i = 0; i < n; i++) {
-      pointsArr[i] = points.get(keysArr[i]);
-      weightsArr[i] = weights.get(keysArr[i]);
+      // create an array to store the weights
+      weightsArr = new float[n];
+
+      for (int i = 0; i < n; i++) {
+        pointsArr[i] = this.points.get(keysArr[i]);
+        weightsArr[i] = this.weights.get(keysArr[i]);
+      }
+    }
+    else {
+      pointsArr = points;
+      weightsArr = weights;
+
+      keysArr = new Integer[n];
+      for (int i = 0; i < n; i++) {
+        keysArr[i] = keys[i];
+      }
     }
 
     // initialise array to store medians

@@ -38,9 +38,8 @@ public class HenzingerTree {
   private int phaseCounter;
 
   // the output of the final coreset
-  private float[][] outPoints;
-  private float[] outWeights;
-  private int[] outKeys;
+  private TreeMap<Integer, float[]> outPoints;
+  private TreeMap<Integer, Float> outWeights;
 
   private CoresetBFL outercore;
 
@@ -57,9 +56,8 @@ public class HenzingerTree {
 
     this.outercore = new CoresetBFL(k, metric, 1);
 
-    this.outPoints = new float[0][0];
-    this.outWeights = new float[0];
-    this.outKeys = new int[0];
+    this.outPoints = new TreeMap<Integer, float[]>();
+    this.outWeights = new TreeMap<Integer, Float>();
   }
 
   // insert a point (we only care about unweighted points)
@@ -186,22 +184,19 @@ public class HenzingerTree {
   private void outerInstance() {
 
     if (root == null) {
-      this.outPoints = new float[0][0];
-      this.outWeights = new float[0];
-      this.outKeys = new int[0];
+      this.outPoints = new TreeMap<Integer, float[]>();
+      this.outWeights = new TreeMap<Integer, Float>();
       return;
     }
 
-    float[][] inPoints = root.getPoints();
-    float[] inWeights = root.getWeights();
-    int[] inKeys = root.getKeys();
+    TreeMap<Integer, float[]> inPoints = root.getPoints();
+    TreeMap<Integer, Float> inWeights = root.getWeights();
 
     // run the outercore
-    outercore.construct(inPoints, inWeights, inKeys, 1.0f/(n + 1), epsilon);
+    outercore.construct(inPoints, inWeights, 1.0f/(n + 1), epsilon);
 
     outPoints = outercore.getPoints();
     outWeights = outercore.getWeights();
-    outKeys = outercore.getKeys();
   }
 
   // cluster the points in the corset
@@ -210,7 +205,7 @@ public class HenzingerTree {
     // call the static algorithm on the outercore output
     OnlineKMedian staticAlgo = new OnlineKMedian(k, metric);
 
-    return staticAlgo.cluster(outPoints, outWeights, outKeys);
+    return staticAlgo.cluster(outPoints, outWeights);
   }
 
   // the parameter lambda for inner ALG instances
@@ -221,6 +216,16 @@ public class HenzingerTree {
   // the paramter epsilon for inner ALG instances
   private float epsilon() {
     return this.epsilon/(6.0f*(float)Math.log(np));
+  }
+
+  // returns the points computed by the tree
+  public TreeMap<Integer, float[]> getPoints() {
+    return outPoints;
+  }
+
+  // returns the weights computed by the tree
+  public TreeMap<Integer, Float> getWeights() {
+    return outWeights;
   }
 
   // print for debugging
@@ -247,13 +252,10 @@ abstract class Node {
   protected Metric metric;
 
   // retrives the set of points in the subtree at this node
-  public abstract float[][] getPoints();
+  public abstract TreeMap<Integer, float[]> getPoints();
 
   // retrives the set of weights of the points in the subtree at this node
-  public abstract float[] getWeights();
-
-  // retrives the set of keys of the points in the subtree at this node
-  public abstract int[] getKeys();
+  public abstract TreeMap<Integer, Float> getWeights();
 
   // recomputes all notes from here to root
   public abstract void recomputeUpwards(int n, float lambda, float epsilon);
@@ -278,9 +280,8 @@ class Internal extends Node {
   public Node right;
 
   // the weighted set maintained as the output of this node
-  private float[][] outPoints;
-  private float[] outWeights;
-  private int[] outKeys;
+  private TreeMap<Integer, float[]> outPoints;
+  private TreeMap<Integer, Float> outWeights;
 
   // the coreset maintained here
   private CoresetBFL innercore;
@@ -289,9 +290,8 @@ class Internal extends Node {
     this.k = k;
     this.metric = metric;
 
-    this.outPoints = new float[0][0];
-    this.outWeights = new float[0];
-    this.outKeys = new int[0];
+    outPoints = new TreeMap<Integer, float[]>();
+    outWeights = new TreeMap<Integer, Float>();
 
     innercore = new CoresetBFL(k, metric, 1);
   }
@@ -310,54 +310,30 @@ class Internal extends Node {
   public void recompute(int n, float lambda, float epsilon) {
 
     // get the union of the inputs
-    float[][] leftPoints = left.getPoints();
-    float[][] rightPoints = right.getPoints();
+    TreeMap<Integer, float[]> inPoints = new TreeMap<Integer, float[]>();
+    TreeMap<Integer, Float> inWeights = new TreeMap<Integer, Float>();
 
-    float[][] inPoints = new float[leftPoints.length + rightPoints.length][];
+    inPoints.putAll(left.getPoints());
+    inPoints.putAll(right.getPoints());
 
-    float[] leftWeights = left.getWeights();
-    float[] rightWeights = right.getWeights();
-
-    float[] inWeights = new float[leftWeights.length + rightWeights.length];
-
-    int[] leftKeys = left.getKeys();
-    int[] rightKeys = right.getKeys();
-
-    int[] inKeys = new int[leftKeys.length + rightKeys.length];
-
-    for (int i = 0; i < leftPoints.length; i++) {
-      inPoints[i] = leftPoints[i];
-      inWeights[i] = leftWeights[i];
-      inKeys[i] = leftKeys[i];
-    }
-
-    for (int i = 0; i < rightPoints.length; i++) {
-      inPoints[i + leftPoints.length] = leftPoints[i];
-      inWeights[i + leftPoints.length] = leftWeights[i];
-      inKeys[i + leftPoints.length] = leftKeys[i];
-    }
+    inWeights.putAll(left.getWeights());
+    inWeights.putAll(right.getWeights());
 
     // compute the coreset
-    innercore.construct(inPoints, inWeights, inKeys, lambda, epsilon);
+    innercore.construct(inPoints, inWeights, lambda, epsilon);
 
     outPoints = innercore.getPoints();
     outWeights = innercore.getWeights();
-    outKeys = innercore.getKeys();
   }
 
   // return coreset output points
-  public float[][] getPoints() {
+  public TreeMap<Integer, float[]> getPoints() {
     return outPoints;
   }
 
   // return coreset output weights
-  public float[] getWeights() {
+  public TreeMap<Integer, Float> getWeights() {
     return outWeights;
-  }
-
-  // return coreset output keys
-  public int[] getKeys() {
-    return outKeys;
   }
 
   // METHOD FOR DEBUGGING
@@ -474,30 +450,21 @@ class Leaf extends Node {
   }
 
   // return the single point
-  public float[][] getPoints() {
+  public TreeMap<Integer, float[]> getPoints() {
 
-    float[][] points = new float[1][point.length];
-    points[0] = point;
+    TreeMap<Integer, float[]> points = new TreeMap<Integer, float[]>();
+    points.put(key, point);
 
     return points;
   }
 
   // return a weight of 1
-  public float[] getWeights() {
+  public TreeMap<Integer, Float> getWeights() {
 
-    float[] weights = new float[1];
-    weights[0] = 1;
+    TreeMap<Integer, Float> weights = new TreeMap<Integer, Float>();
+    weights.put(key, 1.0f);
 
     return weights;
-  }
-
-  // return the key
-  public int[] getKeys() {
-
-    int[] keys = new int[1];
-    keys[0] = key;
-
-    return keys;
   }
 
   // continute the recomputation
