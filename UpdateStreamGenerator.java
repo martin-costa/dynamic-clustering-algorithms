@@ -32,13 +32,22 @@ class SlidingWindow extends UpdateStreamGenerator {
   // stores the dimension of the data
   private int d;
 
+  SlidingWindow(int n, int windowLength, String path, int offset) throws IOException {
+
+    this.n = n;
+    this.windowLength = windowLength;
+
+    // load the data
+    this.loadData(path, offset);
+  }
+
   SlidingWindow(int n, int windowLength, String path) throws IOException {
 
     this.n = n;
     this.windowLength = windowLength;
 
     // load the data
-    this.loadData(path);
+    this.loadData(path, 0);
   }
 
   // returns the data point in update i
@@ -77,12 +86,12 @@ class SlidingWindow extends UpdateStreamGenerator {
   }
 
   // loads the data points
-  private void loadData(String path) throws IOException {
+  private void loadData(String path, int offset) throws IOException {
 
     // create scanner to read from file
     Scanner scanner = new Scanner(new File(path));
 
-    this.n = Math.min(scanner.nextInt(), this.n);
+    this.n = Math.min(scanner.nextInt(), this.n - offset);
     this.d = scanner.nextInt();
 
     // ensure window is not too large
@@ -90,6 +99,11 @@ class SlidingWindow extends UpdateStreamGenerator {
 
     // initialise array to store data
     data = new float[this.n][this.d];
+
+    // move past first offset many points
+    for (int i = 0; i < offset*d; i++) {
+      scanner.nextFloat();
+    }
 
     // load the data from the file
     for (int i = 0; i < this.n; i++) {

@@ -48,7 +48,7 @@ public class Test {
     Metric metric = new LpNorm(2, 1.0f/n);
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, 2000);
 
     // the dynamic algorithms
     DynamicMP dynamicMP = new DynamicMP(k, metric, 15.0f, 0.85f, 0.2f);
@@ -98,7 +98,7 @@ public class Test {
     // DataOutputStream MP03costWriter = new DataOutputStream(new FileOutputStream("results/" + dataset + "_MP03_cost_" + Integer.toString(k)));
     DataOutputStream kmeansppcostWriter = new DataOutputStream(new FileOutputStream("results/" + dataset + "_kmeanspp_cost_" + Integer.toString(k)));
 
-    for (int i = 3000; i < updateStream.streamLength(); i++) {
+    for (int i = 0; i < updateStream.streamLength(); i++) {
 
       // if we have an insertion
       if (updateStream.updateType(i)) {
