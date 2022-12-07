@@ -332,9 +332,9 @@ class Internal extends Node {
     }
 
     for (int i = 0; i < rightPoints.length; i++) {
-      inPoints[i + leftPoints.length] = leftPoints[i];
-      inWeights[i + leftPoints.length] = leftWeights[i];
-      inKeys[i + leftPoints.length] = leftKeys[i];
+      inPoints[i + leftPoints.length] = rightPoints[i];
+      inWeights[i + leftPoints.length] = rightWeights[i];
+      inKeys[i + leftPoints.length] = rightKeys[i];
     }
 
     // compute the coreset
