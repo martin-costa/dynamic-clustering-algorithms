@@ -112,9 +112,11 @@ public class OnlineKMedian {
     // get the clustering
     TreeMap<Integer, Integer> solution = cluster();
 
-    // perform 2 iterations of Lloyd's and return
-    KMeansPlusPlus kmeanspp = new KMeansPlusPlus(k, metric);
-    return kmeanspp.cluster(points, weights, solution);
+    return solution;
+
+    // // perform 2 iterations of Lloyd's and return
+    // KMeansPlusPlus kmeanspp = new KMeansPlusPlus(k, metric);
+    // return kmeanspp.cluster(points, weights, solution);
   }
 
   // implementation of online k-median algorithm
