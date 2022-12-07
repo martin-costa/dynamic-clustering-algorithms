@@ -51,7 +51,7 @@ public class Test {
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, 2000);
 
     // the dynamic algorithms
-    DynamicMP dynamicMP = new DynamicMP(k, metric, 15.0f, 0.85f, 0.2f);
+    DynamicMP dynamicMP = new DynamicMP(k, metric, 30.0f, 0.85f, 0.2f);
 
     // sampling threshold for the static coreset
     int threshold = 1000;
