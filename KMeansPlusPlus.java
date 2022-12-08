@@ -318,7 +318,7 @@ class KMeansPlusPlus {
     // if we have < k new centers, set some other arbitrary ones
     if (newCenters.length < k) {
 
-      tempNewCenters = newCenters;
+      float[][] tempNewCenters = newCenters;
       newCenters = new float[k][];
 
       for (int i = 0; i < tempNewCenters.length; i++) {
@@ -331,7 +331,7 @@ class KMeansPlusPlus {
     }
 
     @SuppressWarnings("unchecked")
-    ArrayList[] tempClusters = new ArrayList[k];
+    ArrayList<Integer>[] tempClusters = new ArrayList[k];
 
     // reset the clusters
     for (int i = 0; i < k; i++) {
