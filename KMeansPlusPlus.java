@@ -315,10 +315,19 @@ class KMeansPlusPlus {
   // given the new centers create the clusters
   private void createClusters(float[][] newCenters) {
 
-    // if we have < k new centers, then we have < k distinct points, call seed
+    // if we have < k new centers, set some other arbitrary ones
     if (newCenters.length < k) {
-      seedStartingCenters();
-      return;
+
+      tempNewCenters = newCenters;
+      newCenters = new float[k][];
+
+      for (int i = 0; i < tempNewCenters.length; i++) {
+        newCenters[i] = tempNewCenters[i];
+      }
+
+      for (int i = tempNewCenters.length; i < k; i++) {
+        newCenters[i] = points[i];
+      }
     }
 
     @SuppressWarnings("unchecked")
