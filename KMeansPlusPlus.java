@@ -211,8 +211,12 @@ class KMeansPlusPlus {
 
     float[][] samplePoints = new float[k][d];
 
+    // distances from samples points
+    float[] dist = new float[n];
+    Arrays.fill(dist, Float.POSITIVE_INFINITY);
+
     for (int i = 0; i < k; i++) {
-      samplePoints[i] = points[dSquaredWeighting(rng, probs)];
+      samplePoints[i] = points[dSquaredWeighting(rng, probs, dist)];
     }
 
     // create the initial clusters
@@ -220,11 +224,7 @@ class KMeansPlusPlus {
   }
 
   // sample a point according to D^2 weighting
-  private int dSquaredWeighting(Random rng, float[] probs) {
-
-    // distances from samples points
-    float[] dist = new float[n];
-    Arrays.fill(dist, Float.POSITIVE_INFINITY);
+  private int dSquaredWeighting(Random rng, float[] probs, float[] dist) {
 
     float r = rng.nextFloat();
     float s = 0;
