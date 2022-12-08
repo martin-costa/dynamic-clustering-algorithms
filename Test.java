@@ -50,7 +50,7 @@ public class Test {
     Metric metric = new LpNorm(2);
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, 2000);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
 
     // the dynamic algorithms
     DynamicMP dynamicMP = new DynamicMP(k, metric, 30.0f, 0.85f, 0.2f);

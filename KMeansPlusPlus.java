@@ -219,29 +219,6 @@ class KMeansPlusPlus {
     createClusters(samplePoints);
   }
 
-  // get the point in cluster i closest to the center of mass of cluster i
-  private int getClusterCenter(int i) {
-
-    float[] centerOfMass = clusterCenterOfMass(i);
-
-    if (clusters[i].length == 0) {
-      return 0;
-    }
-
-    int closestPoint = clusters[i][0];
-    float dist = Float.POSITIVE_INFINITY;
-
-    for (int j : clusters[i]) {
-      float d = metric.d(points[j], centerOfMass);
-      if (d < dist) {
-        closestPoint = j;
-        dist = d;
-      }
-    }
-
-    return closestPoint;
-  }
-
   // sample a point according to D^2 weighting
   private int dSquaredWeighting(Random rng, float[] probs) {
 
@@ -285,6 +262,29 @@ class KMeansPlusPlus {
     }
 
     return sample;
+  }
+
+  // get the point in cluster i closest to the center of mass of cluster i
+  private int getClusterCenter(int i) {
+
+    float[] centerOfMass = clusterCenterOfMass(i);
+
+    if (clusters[i].length == 0) {
+      return 0;
+    }
+
+    int closestPoint = clusters[i][0];
+    float dist = Float.POSITIVE_INFINITY;
+
+    for (int j : clusters[i]) {
+      float d = metric.d(points[j], centerOfMass);
+      if (d < dist) {
+        closestPoint = j;
+        dist = d;
+      }
+    }
+
+    return closestPoint;
   }
 
   // standard kmeans
