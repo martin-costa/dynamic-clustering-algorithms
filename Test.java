@@ -17,6 +17,8 @@ public class Test {
   // 'kddcup' input path
   private static String kddcup = "kddcup";
 
+  private CoresetBFL L;
+
   // main function to run tests
   public static void main(String[] args) throws IOException, InterruptedException {
 
@@ -45,7 +47,7 @@ public class Test {
       queryCount = Integer.parseInt(args[4]);
 
     // the metric to be used
-    Metric metric = new LpNorm(2, 1.0f/n);
+    Metric metric = new LpNorm(1);
 
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, 2000);

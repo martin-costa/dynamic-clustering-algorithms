@@ -70,7 +70,7 @@ public class CoresetBFL {
 
     int m = (int)(m1*m2);
 
-    m = 1000;
+    m = 100;
 
     // if there aren't enough points
     if (n < m) {
