@@ -52,7 +52,7 @@ public class Test {
     float beta = 0.5f;
     float epsilon = 0.2f;
 
-    DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[1];
+    DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[6];
 
     dynamicAlgorithms[0] = new DynamicMP(k, metric, 15.0f, beta, epsilon);
     dynamicAlgorithms[1] = new DynamicMP(k, metric, 30.0f, beta, epsilon);
