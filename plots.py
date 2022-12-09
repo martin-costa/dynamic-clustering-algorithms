@@ -32,7 +32,7 @@ def load_data_single(dataset, k, param, algo):
 # create a plot for dataset and k
 def plot_data(rows):
 
-    fig, axs = plt.subplots(len(rows), 3, figsize=(12, 5*len(rows)))
+    fig, axs = plt.subplots(len(rows), 3, figsize=(15, 5*len(rows)))
 
     for i in range(len(rows)):
         plot_data_row(axs[i], rows[i][0], rows[i][1], rows[i][2], rows[i][3], rows[i][4])
