@@ -22,10 +22,19 @@ def load_file(path, f):
 
     return values
 
+# method to turn total query time to average
+def amortize(values):
+
+    for i in range(len(values)):
+        values[i] = values[i]/(i + 1)
+
+    return values
+
 def load_data_single(dataset, k, param, algo):
 
     update_times = load_file('results/' + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_updatetime', nano_to_seconds)
     query_times = load_file('results/' + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_querytime', nano_to_seconds)
+    query_times = amortize(query_times)
     costs = load_file('results/' + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_cost', float)
 
     return update_times, query_times, costs
@@ -83,8 +92,8 @@ def plot_data_row(axs, dataset, k, params, algo, colors):
     # query times
     for i in range(len(params)):
         axs[1].plot(x_queries, data[i][1], label=str(params[i]) + '_' + algo, color=colors[i])
-    axs[1].set_title('Total Query Time (' + dataset + ', k = ' + str(k) + ')')
-    axs[1].set(xlabel='Updates', ylabel='Total Query Time (sec)')
+    axs[1].set_title('Average Query Time (' + dataset + ', k = ' + str(k) + ')')
+    axs[1].set(xlabel='Updates', ylabel='Average Query Time (sec)')
     axs[1].legend()
 
     # costs
@@ -96,20 +105,36 @@ def plot_data_row(axs, dataset, k, params, algo, colors):
 
     # plt.suptitle('dataset = ' + dataset + ', k = ' + str(k) + ', ' + str(n) + ' updates, ' + str(q) + ' queries')
 
-if __name__ == '__main__':
+# construct a page for some value of k
+def get_page(k, alphas, thresholds):
 
     blues = ['#20B2AA', '#00BFFF', '#0000FF']
     reds = ['#FFA500', '#EE82EE', '#FF0000']
 
-    page_k10 = [
+    page = [
 
-     ['census', 10, [15, 30, 60], 'BCLP', blues],
-     ['census', 10, [250, 500, 1000], 'HK20', reds],
-     ['song', 10, [15, 30, 60], 'BCLP', blues],
-     ['song', 10, [250, 500, 1000], 'HK20', reds],
-     ['kddcup', 10, [15, 30, 60], 'BCLP', blues],
-     ['kddcup', 10, [250, 500, 1000], 'HK20', reds]
+     ['census', k, alphas, 'BCLP', blues],
+     ['census', k, thresholds, 'HK20', reds],
+     ['song', k, alphas, 'BCLP', blues],
+     ['song', k, thresholds, 'HK20', reds],
+     ['kddcup', k, alphas, 'BCLP', blues],
+     ['kddcup', k, thresholds, 'HK20', reds]
 
     ]
 
-    plot_data([page_k10])
+    return page
+
+def get_pages(kValues, alphas, thresholds):
+
+    pages = []
+    for k in kValues:
+        pages = pages + [get_page(k, alphas, thresholds)]
+
+    return pages
+
+if __name__ == '__main__':
+
+    alphas = [2, 5, 10]
+    thresholds = [25, 50, 100]
+
+    plot_data(get_pages([5, 10, 25], alphas, thresholds))

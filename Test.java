@@ -59,12 +59,6 @@ public class Test {
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
 
-    /*
-
-    run the tests
-
-    */
-
     float beta = 0.5f;
     float epsilon = 0.2f;
 
@@ -80,11 +74,17 @@ public class Test {
 
     //runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
 
-    int[] kValues = { 10, 50, 100 };
-    float[] alphaValues = { 15.0f, 30.0f, 60.0f };
-    int[] mValues = { 250, 500, 1000 };
+    /*
 
-    runBatchTests(kValues, alphaValues, mValues);
+    run the tests
+
+    */
+
+    int[] kValues = { 5, 10, 25 };
+    float[] alphaValues = { 2f, 5f, 10f };
+    int[] mValues = { 25, 50, 100 };
+
+    runBatchTests(1000, 200, 50, kValues, alphaValues, mValues);
   }
 
   // run tests on many algorithmss
@@ -184,11 +184,7 @@ public class Test {
   }
 
   // run the complete tests
-  public static void runBatchTests(int[] kValues, float[] alphaValues, int[] mValues) throws IOException {
-
-    int n = 10000;
-    int windowLength = 2000;
-    int queryCount = 1000;
+  public static void runBatchTests(int n, int windowLength, int queryCount, int[] kValues, float[] alphaValues, int[] mValues) throws IOException {
 
     Metric metric = new LpNorm(1);
 
@@ -200,21 +196,26 @@ public class Test {
     for (int k : kValues) {
       for (String dataset : datasets) {
 
-        DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[6];
+        DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[alphaValues.length + mValues.length];
 
-        dynamicAlgorithms[0] = new DynamicMP(k, metric, 15.0f, beta, epsilon);
-        dynamicAlgorithms[1] = new DynamicMP(k, metric, 30.0f, beta, epsilon);
-        dynamicAlgorithms[2] = new DynamicMP(k, metric, 60.0f, beta, epsilon);
+        for (int i = 0; i < alphaValues.length; i++) {
+          dynamicAlgorithms[i] = new DynamicMP(k, metric, alphaValues[i], beta, epsilon);
+        }
 
-        dynamicAlgorithms[3] = new HenzingerTree(k, metric, 250);
-        dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
-        dynamicAlgorithms[5] = new HenzingerTree(k, metric, 1000);
+        for (int i = 0; i < mValues.length; i++) {
+          dynamicAlgorithms[i + alphaValues.length] = new HenzingerTree(k, metric, mValues[i]);
+        }
 
         SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
 
         runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
       }
     }
+  }
+
+  // run the complete tests
+  public static void runBatchTests(int[] kValues, float[] alphaValues, int[] mValues) throws IOException {
+    runBatchTests(10000, 2000, 500, kValues, alphaValues, mValues);
   }
 
   // compute the cost of solution with respect points with this metric
