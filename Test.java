@@ -17,7 +17,7 @@ public class Test {
   // 'kddcup' input path
   private static String kddcup = "kddcup";
 
-  private CoresetBFL L;
+  private CoresetBFL compilingBFL;
 
   // main function to run tests
   public static void main(String[] args) throws IOException, InterruptedException {
@@ -54,23 +54,21 @@ public class Test {
       queryCount = Integer.parseInt(args[4]);
 
     // the metric to be used
-    Metric metric = new LpNorm(2);
+    Metric metric = new LpNorm(1);
 
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
 
     /*
 
-    initialise the algorithms we will run
+    run the tests
 
     */
-
-    int l = 6;
 
     float beta = 0.5f;
     float epsilon = 0.2f;
 
-    DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[l];
+    DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[6];
 
     dynamicAlgorithms[0] = new DynamicMP(k, metric, 15.0f, beta, epsilon);
     dynamicAlgorithms[1] = new DynamicMP(k, metric, 30.0f, beta, epsilon);
@@ -81,6 +79,12 @@ public class Test {
     dynamicAlgorithms[5] = new HenzingerTree(k, metric, 1000);
 
     runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+
+    int[] kValues = { 10, 50, 100 };
+    float[] alphaValues = { 15.0f, 30.0f, 60.0f };
+    int[] mValues = { 250, 500, 1000 };
+
+    //runBatchTests(kValues, alphaValues, mValues);
   }
 
   // run tests on many algorithmss
@@ -176,6 +180,40 @@ public class Test {
       updateTimeWriters[i].close();
       queryTimeWriters[i].close();
       costWriters[i].close();
+    }
+  }
+
+  // run the complete tests
+  public static void runBatchTests(int[] kValues, float[] alphaValues, int[] mValues) throws IOException {
+
+    int n = 10000;
+    int windowLength = 2000;
+    int queryCount = 1000;
+
+    Metric metric = new LpNorm(1);
+
+    float beta = 0.5f;
+    float epsilon = 0.2f;
+
+    String[] datasets = {census, song, kddcup};
+
+    for (int k : kValues) {
+      for (String dataset : datasets) {
+
+        DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[6];
+
+        dynamicAlgorithms[0] = new DynamicMP(k, metric, 15.0f, beta, epsilon);
+        dynamicAlgorithms[1] = new DynamicMP(k, metric, 30.0f, beta, epsilon);
+        dynamicAlgorithms[2] = new DynamicMP(k, metric, 60.0f, beta, epsilon);
+
+        dynamicAlgorithms[3] = new HenzingerTree(k, metric, 250);
+        dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
+        dynamicAlgorithms[5] = new HenzingerTree(k, metric, 1000);
+
+        SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
+
+        runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+      }
     }
   }
 
