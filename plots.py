@@ -62,28 +62,27 @@ def plot_data_row(axs, dataset, k, params, algo, colors):
         axs[0].plot(x_updates, data[i][0], label=str(params[i]) + '_' + algo, color=colors[i])
     axs[0].set_title('Total Update Time')
     axs[0].set(xlabel='Updates', ylabel='Total Update Time (sec)')
-    axs[0].legend();
+    axs[0].legend()
 
     # query times
     for i in range(len(params)):
         axs[1].plot(x_queries, data[i][1], label=str(params[i]) + '_' + algo, color=colors[i])
     axs[1].set_title('Total Query Time')
     axs[1].set(xlabel='Updates', ylabel='Total Query Time (sec)')
-    axs[1].legend();
+    axs[1].legend()
 
     # costs
     for i in range(len(params)):
         axs[2].plot(x_queries, data[i][2], label=str(params[i]) + '_' + algo, color=colors[i])
     axs[2].set_title('Cost of Solution')
     axs[2].set(xlabel='Updates', ylabel='Cost')
-    axs[2].legend();
+    axs[2].legend()
 
-    plt.suptitle(str(n) + ' updates from the ' + dataset + ' dataset, ' + str(q) + ' queries, and k = ' + str(k))
+    plt.suptitle('dataset = ' + dataset + ', k = ' + str(k) + ', ' + str(n) + ' updates, ' + str(q) + ' queries')
 
 if __name__ == '__main__':
 
     blues = ['#20B2AA', '#00BFFF', '#0000FF']
-
     reds = ['#FFA500', '#EE82EE', '#FF0000']
 
     plot_data([['census', 10, [15, 30, 60], 'BCLP', blues], ['census', 10, [250, 500, 1000], 'HK20', reds]])

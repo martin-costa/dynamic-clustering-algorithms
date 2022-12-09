@@ -99,7 +99,7 @@ def plot_data(dataset, k):
     axs[2].set(xlabel='Updates', ylabel='Cost')
     axs[2].legend();
 
-    plt.suptitle(str(n) + ' updates from the ' + dataset + ' dataset, ' + str(q) + ' queries, and k = ' + str(k))
+    fig.suptitle(str(n) + ' updates from the ' + dataset + ' dataset, ' + str(q) + ' queries, and k = ' + str(k))
 
     fig.tight_layout()
 
