@@ -18,6 +18,9 @@ public class CoresetBFL {
   // the paramter rho of the rho-metric space
   private float rho;
 
+  // coreset size
+  private int m;
+
   // algorithm and factors for the (alpha, beta)-approximation
   private KMeansPlusPlus kmeanspp;
 
@@ -38,11 +41,13 @@ public class CoresetBFL {
   private float[] outWeights;
   private int[] outKeys;
 
-  public CoresetBFL(int k, Metric metric, float rho) {
+  public CoresetBFL(int k, Metric metric, int m) {
     this.k = k;
     this.metric = metric;
 
-    this.rho = rho;
+    this.rho = 1;
+
+    this.m = m;
 
     this.kmeanspp = new KMeansPlusPlus(k, metric);
 
@@ -70,7 +75,7 @@ public class CoresetBFL {
 
     int m = (int)(m1*m2);
 
-    m = 1000;
+    m = this.m;
 
     // if there aren't enough points
     if (n < m) {

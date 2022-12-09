@@ -11,7 +11,7 @@ implementation of our dynamic data structure for maintaining a coreset
 */
 
 // our dynamic coreset data structure
-public class DynamicMP {
+public class DynamicMP extends DynamicAlgorithm {
 
   // the underlying metric space
   private TreeMap<Integer, float[]> space;
@@ -370,5 +370,9 @@ public class DynamicMP {
     System.out.print("Size of metric space: ");
     System.out.println(this.space.size());
     System.out.println("");
+  }
+
+  public String name() {
+    return String.valueOf(k) + "_" + String.valueOf((int)alpha) + "_BCLP";
   }
 }

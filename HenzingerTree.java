@@ -8,7 +8,7 @@ implementation of balanced binary tree DS used in Henzinger et al. dynamic cores
 */
 
 // the blanaced binary tree used to mantain a dynmaic coreset
-public class HenzingerTree {
+public class HenzingerTree extends DynamicAlgorithm {
 
   // the root node
   private Node root;
@@ -33,6 +33,8 @@ public class HenzingerTree {
 
   private float epsilon;
 
+  private int m = 0;
+
   // phase parameters
   private int np;
   private int phaseCounter;
@@ -44,10 +46,11 @@ public class HenzingerTree {
 
   private CoresetBFL outercore;
 
-  public HenzingerTree(int k, Metric metric, float epsilon) {
+  public HenzingerTree(int k, Metric metric, int m) {
     this.k = k;
     this.metric = metric;
     this.epsilon = epsilon;
+    this.m = m;
 
     this.leafFinder = new TreeMap<Integer, Leaf>();
     this.n = 0;
@@ -55,7 +58,7 @@ public class HenzingerTree {
     this.np = 0;
     this.phaseCounter = 0;
 
-    this.outercore = new CoresetBFL(k, metric, 1);
+    this.outercore = new CoresetBFL(k, metric, m);
 
     this.outPoints = new float[0][0];
     this.outWeights = new float[0];
@@ -71,7 +74,7 @@ public class HenzingerTree {
     if (leafFinder.get(key) != null) return;
 
     // create new leaf
-    Leaf leaf = new Leaf(k, metric, key, point);
+    Leaf leaf = new Leaf(k, metric, m, key, point);
 
     // check if the tree is empty
     if (n == 0) {
@@ -228,6 +231,10 @@ public class HenzingerTree {
     if (root != null)
       root.print();
   }
+
+  public String name() {
+    return String.valueOf(k) + "_" + String.valueOf(m) + "_HK20";
+  }
 }
 
 /*
@@ -245,6 +252,9 @@ abstract class Node {
   // parameters for clustering
   protected int k;
   protected Metric metric;
+
+  // coreset threshold
+  protected int m;
 
   // retrives the set of points in the subtree at this node
   public abstract float[][] getPoints();
@@ -285,15 +295,16 @@ class Internal extends Node {
   // the coreset maintained here
   private CoresetBFL innercore;
 
-  Internal(int k, Metric metric) {
+  Internal(int k, Metric metric, int m) {
     this.k = k;
     this.metric = metric;
+    this.m = m;
 
     this.outPoints = new float[0][0];
     this.outWeights = new float[0];
     this.outKeys = new int[0];
 
-    innercore = new CoresetBFL(k, metric, 1);
+    innercore = new CoresetBFL(k, metric, m);
   }
 
   // continue the recomputation
@@ -388,9 +399,10 @@ class Leaf extends Node {
   // gets the previous leaf
   public Leaf last;
 
-  Leaf(int k, Metric metric, int key, float[] point) {
+  Leaf(int k, Metric metric, int m, int key, float[] point) {
     this.k = k;
     this.metric = metric;
+    this.m = m;
     this.key = key;
     this.point = point;
   }
@@ -405,7 +417,7 @@ class Leaf extends Node {
     this.next = leaf;
 
     // create new internal node
-    Internal internal = new Internal(k, metric);
+    Internal internal = new Internal(k, metric, m);
 
     // set the pointer of the parent node
     if (this.parent != null) {
