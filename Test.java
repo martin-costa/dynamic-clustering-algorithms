@@ -78,13 +78,13 @@ public class Test {
     dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
     dynamicAlgorithms[5] = new HenzingerTree(k, metric, 1000);
 
-    runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+    //runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
 
     int[] kValues = { 10, 50, 100 };
     float[] alphaValues = { 15.0f, 30.0f, 60.0f };
     int[] mValues = { 250, 500, 1000 };
 
-    //runBatchTests(kValues, alphaValues, mValues);
+    runBatchTests(kValues, alphaValues, mValues);
   }
 
   // run tests on many algorithmss
