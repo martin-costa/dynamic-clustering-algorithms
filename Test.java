@@ -29,29 +29,19 @@ public class Test {
     */
 
     // dataset
-    String dataset = census;
-    if (args.length > 0)
-      dataset = args[0];
+    String dataset = kddcup;
 
     // parameter k
-    int k = 10;
-    if (args.length > 1)
-      k = Integer.parseInt(args[1]);
+    int k = 100;
 
     // set the window length
     int windowLength = 2000;
-    if (args.length > 2)
-      windowLength = Integer.parseInt(args[2]);
 
     // create un update stream of length n
     int n = 10000;
-    if (args.length > 3)
-      n = Integer.parseInt(args[3]);
 
     // number of queries to perform over the stream
-    int queryCount = (int)(n / 10);
-    if (args.length > 4)
-      queryCount = Integer.parseInt(args[4]);
+    int queryCount = 500;
 
     // the metric to be used
     Metric metric = new LpNorm(1);
@@ -62,7 +52,7 @@ public class Test {
     float beta = 0.5f;
     float epsilon = 0.2f;
 
-    DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[6];
+    DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[1];
 
     dynamicAlgorithms[0] = new DynamicMP(k, metric, 15.0f, beta, epsilon);
     dynamicAlgorithms[1] = new DynamicMP(k, metric, 30.0f, beta, epsilon);
@@ -80,11 +70,11 @@ public class Test {
 
     */
 
-    int[] kValues = { 5, 10, 25 };
-    float[] alphaValues = { 2f, 5f, 10f };
-    int[] mValues = { 25, 50, 100 };
+    int[] kValues = { 10, 50, 100 };
+    float[] alphaValues = { 250, 500, 1000 };
+    int[] mValues = { 250, 500, 1000 };
 
-    runBatchTests(1000, 200, 50, kValues, alphaValues, mValues);
+    runBatchTests(3000, 2000, 100, kValues, alphaValues, mValues);
   }
 
   // run tests on many algorithmss
@@ -173,6 +163,8 @@ public class Test {
       // print
       System.out.print("n = ");
       System.out.println(i);
+      System.out.print("dataset = ");
+      System.out.println(dataset);
     }
 
     // close the file streams

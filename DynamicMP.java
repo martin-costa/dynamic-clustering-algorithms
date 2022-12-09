@@ -59,7 +59,7 @@ public class DynamicMP extends DynamicAlgorithm {
     this.tau = beta*epsilon;
 
     // sampling parameter
-    this.sampleSize = (int)Math.floor(alpha*k);
+    this.sampleSize = (int)Math.floor(alpha);
 
     // initialise the data structures
     this.space = new TreeMap<Integer, float[]>();

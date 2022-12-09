@@ -75,7 +75,7 @@ public class CoresetBFL {
 
     int m = (int)(m1*m2);
 
-    m = this.m;
+    m = Math.max(this.m, k);
 
     // if there aren't enough points
     if (n < m) {
