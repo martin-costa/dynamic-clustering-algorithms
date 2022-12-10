@@ -134,7 +134,7 @@ def get_pages(kValues, alphas, thresholds):
 
 if __name__ == '__main__':
 
-    alphas = [2, 5, 10]
-    thresholds = [25, 50, 100]
+    alphas = [250, 500, 1000]
+    thresholds = [250, 500, 1000]
 
-    plot_data(get_pages([5, 10, 25], alphas, thresholds))
+    plot_data(get_pages([10], alphas, thresholds))
