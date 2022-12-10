@@ -70,7 +70,7 @@ public class Test {
 
     */
 
-    int[] kValues = { 10, 50, 100 };
+    int[] kValues = { 50, 100 };
     float[] alphaValues = { 250, 500, 1000 };
     int[] mValues = { 250, 500, 1000 };
 
@@ -161,10 +161,12 @@ public class Test {
       }
 
       // print
-      System.out.print("n = ");
-      System.out.println(i);
-      System.out.print("dataset = ");
-      System.out.println(dataset);
+      if (i % (int)(updateStream.streamLength()/100) == 0) {
+        System.out.print(100*i/updateStream.streamLength());
+        System.out.print("% complete (");
+        System.out.print(i);
+        System.out.println(" updates)");
+      }
     }
 
     // close the file streams
@@ -200,7 +202,14 @@ public class Test {
 
         SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
 
-        runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+        if (!(dataset.equals("census") && k == 50)) {
+          System.out.println("----------------");
+          System.out.println("Dataset: " + dataset);
+          System.out.print("k: ");
+          System.out.println(k);
+          System.out.println("----------------");
+          runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+        }
       }
     }
   }
