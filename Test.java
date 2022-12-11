@@ -44,7 +44,7 @@ public class Test {
     int queryCount = 500;
 
     // the metric to be used
-    Metric metric = new LpNorm(1, 1.0f/n);
+    Metric metric = new LpNorm(2, 1.0f/n);
 
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
@@ -62,7 +62,7 @@ public class Test {
     dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
     dynamicAlgorithms[5] = new HenzingerTree(k, metric, 1000);
 
-    runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+    //runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
 
     /*
 
@@ -70,11 +70,11 @@ public class Test {
 
     */
 
-    int[] kValues = { 50, 100 };
+    int[] kValues = { 10, 50, 100 };
     float[] alphaValues = { 250, 500, 1000 };
     int[] mValues = { 250, 500, 1000 };
 
-    //runBatchTests(3000, 2000, 100, kValues, alphaValues, mValues, metric);
+    runBatchTests(3000, 2000, 100, kValues, alphaValues, mValues, metric);
   }
 
   // run tests on many algorithmss
@@ -200,14 +200,12 @@ public class Test {
 
         SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
 
-        if (!(dataset.equals("census") && k == 50)) {
-          System.out.println("----------------");
-          System.out.println("Dataset: " + dataset);
-          System.out.print("k: ");
-          System.out.println(k);
-          System.out.println("----------------");
-          runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
-        }
+        System.out.println("----------------");
+        System.out.println("Dataset: " + dataset);
+        System.out.print("k: ");
+        System.out.println(k);
+        System.out.println("----------------");
+        runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
       }
     }
   }
