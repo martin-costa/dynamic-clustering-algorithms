@@ -32,19 +32,19 @@ public class Test {
     String dataset = kddcup;
 
     // parameter k
-    int k = 100;
+    int k = 50;
 
     // set the window length
     int windowLength = 2000;
 
     // create un update stream of length n
-    int n = 10000;
+    int n = 3000;
 
     // number of queries to perform over the stream
     int queryCount = 500;
 
     // the metric to be used
-    Metric metric = new LpNorm(1);
+    Metric metric = new LpNorm(2, 1.0f/n);
 
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
@@ -54,15 +54,15 @@ public class Test {
 
     DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[6];
 
-    dynamicAlgorithms[0] = new DynamicMP(k, metric, 15.0f, beta, epsilon);
-    dynamicAlgorithms[1] = new DynamicMP(k, metric, 30.0f, beta, epsilon);
-    dynamicAlgorithms[2] = new DynamicMP(k, metric, 60.0f, beta, epsilon);
+    dynamicAlgorithms[0] = new DynamicMP(k, metric, 250, beta, epsilon);
+    dynamicAlgorithms[1] = new DynamicMP(k, metric, 500, beta, epsilon);
+    dynamicAlgorithms[2] = new DynamicMP(k, metric, 1000, beta, epsilon);
 
     dynamicAlgorithms[3] = new HenzingerTree(k, metric, 250);
     dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
     dynamicAlgorithms[5] = new HenzingerTree(k, metric, 1000);
 
-    //runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+    runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
 
     /*
 
@@ -74,7 +74,7 @@ public class Test {
     float[] alphaValues = { 250, 500, 1000 };
     int[] mValues = { 250, 500, 1000 };
 
-    runBatchTests(3000, 2000, 100, kValues, alphaValues, mValues);
+    //runBatchTests(3000, 2000, 100, kValues, alphaValues, mValues, metric);
   }
 
   // run tests on many algorithmss
@@ -178,9 +178,7 @@ public class Test {
   }
 
   // run the complete tests
-  public static void runBatchTests(int n, int windowLength, int queryCount, int[] kValues, float[] alphaValues, int[] mValues) throws IOException {
-
-    Metric metric = new LpNorm(1);
+  public static void runBatchTests(int n, int windowLength, int queryCount, int[] kValues, float[] alphaValues, int[] mValues, Metric metric) throws IOException {
 
     float beta = 0.5f;
     float epsilon = 0.2f;
@@ -215,8 +213,8 @@ public class Test {
   }
 
   // run the complete tests
-  public static void runBatchTests(int[] kValues, float[] alphaValues, int[] mValues) throws IOException {
-    runBatchTests(10000, 2000, 500, kValues, alphaValues, mValues);
+  public static void runBatchTests(int[] kValues, float[] alphaValues, int[] mValues, Metric metric) throws IOException {
+    runBatchTests(10000, 2000, 500, kValues, alphaValues, mValues, metric);
   }
 
   // compute the cost of solution with respect points with this metric
