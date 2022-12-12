@@ -137,4 +137,4 @@ if __name__ == '__main__':
     alphas = [250, 500, 1000]
     thresholds = [250, 500, 1000]
 
-    plot_data(get_pages([10, 50], alphas, thresholds))
+    plot_data(get_pages([10, 50, 100], alphas, thresholds))
