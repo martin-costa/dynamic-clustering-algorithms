@@ -30,12 +30,12 @@ def amortize(values):
 
     return values
 
-def load_data_single(dataset, k, param, algo, dir='results/'):
+def load_data_single(dataset, k, algo, dir='results/'):
 
-    update_times = load_file(dir + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_updatetime', nano_to_seconds)
-    query_times = load_file(dir + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_querytime', nano_to_seconds)
+    update_times = load_file(dir + dataset + '_' + str(k) + '_' + algo + '_updatetime', nano_to_seconds)
+    query_times = load_file(dir + dataset + '_' + str(k) + '_' + algo + '_querytime', nano_to_seconds)
     query_times = amortize(query_times)
-    costs = load_file(dir + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_cost', float)
+    costs = load_file(dir + dataset + '_' + str(k) + '_' + algo + '_cost', float)
 
     return update_times, query_times, costs
 
@@ -59,62 +59,23 @@ def plot_data(pages, dir='results/'):
 # create a plot for dataset and k
 def plot_data_page(page, dir='results/'):
 
-    fig, axs = plt.subplots(len(page), 4, figsize=(6*4, 5*len(page)))
+    fig, axs = plt.subplots(len(page), 2*len(page[0][2]), figsize=(6*2*len(page[0][2]), 5*len(page)))
 
     for i in range(len(page)):
-        plot_data_row_2(axs[i], page[i][0], page[i][1], page[i][2], page[i][3], page[i][4], dir)
+        plot_data_row_2(axs[i], page[i][0], page[i][1], page[i][2], page[i][3], dir)
 
     fig.tight_layout()
 
     return fig
 
 # create a plot for dataset and k
-def plot_data_row(axs, dataset, k, params, algo, colors):
+def plot_data_row_2(axs, dataset, k, algos, colors, dir='results/'):
 
-    data = []
+    data = [[]]*len(algos)
 
-    for p in params:
-        data = data + [load_data_single(dataset, k, p, algo)]
-
-    n = len(data[0][0])
-    q = len(data[0][1])
-
-    x_updates = np.linspace(1, n, n)
-    x_queries = np.linspace(1, n, q)
-
-    # update times
-    for i in range(len(params)):
-        axs[0].plot(x_updates, data[i][0], label=str(params[i]) + '_' + algo, color=colors[i])
-    axs[0].set_title('Total Update Time (' + dataset + ', k = ' + str(k) + ')')
-    axs[0].set(xlabel='Updates', ylabel='Total Update Time (sec)')
-    axs[0].legend()
-
-    # query times
-    for i in range(len(params)):
-        axs[1].plot(x_queries, data[i][1], label=str(params[i]) + '_' + algo, color=colors[i])
-    axs[1].set_title('Average Query Time (' + dataset + ', k = ' + str(k) + ')')
-    axs[1].set(xlabel='Updates', ylabel='Average Query Time (sec)')
-    axs[1].legend()
-
-    # costs
-    for i in range(len(params)):
-        axs[2].plot(x_queries, data[i][2], label=str(params[i]) + '_' + algo, color=colors[i])
-    axs[2].set_title('Cost of Solution (' + dataset + ', k = ' + str(k) + ')')
-    axs[2].set(xlabel='Updates', ylabel='Cost')
-    axs[2].legend()
-
-    # plt.suptitle('dataset = ' + dataset + ', k = ' + str(k) + ', ' + str(n) + ' updates, ' + str(q) + ' queries')
-
-# create a plot for dataset and k
-def plot_data_row_2(axs, dataset, k, params, algo, colors, dir='results/'):
-
-    data = [[], []]
-
-    for p in params[0]:
-        data[0] = data[0] + [load_data_single(dataset, k, p, algo[0], dir)]
-
-    for p in params[1]:
-        data[1] = data[1] + [load_data_single(dataset, k, p, algo[1], dir)]
+    for i in range(len(algos)):
+        for alg in algos[i]:
+            data[i] = data[i] + [load_data_single(dataset, k, alg, dir)]
 
     n = len(data[0][0][0])
     q = len(data[0][0][1])
@@ -122,55 +83,57 @@ def plot_data_row_2(axs, dataset, k, params, algo, colors, dir='results/'):
     x_updates = np.linspace(1, n, n)
     x_queries = np.linspace(1, n, q)
 
-    for j in range(2):
+    for j in range(len(algos)):
 
         # update times
-        for i in range(len(params[j])):
-            axs[j].plot(x_updates, data[j][i][0], label=str(params[j][i]) + '_' + algo[j], color=colors[j][i])
+        for i in range(len(algos[j])):
+            axs[j].plot(x_updates, data[j][i][0], label=algos[j][i], color=colors[j][i])
         axs[j].set_title('Total Update Time (' + dataset + ', k = ' + str(k) + ')')
         axs[j].set(xlabel='Updates', ylabel='Total Update Time (sec)')
         axs[j].legend()
 
         # costs
-        for i in range(len(params[j])):
-            axs[2+j].plot(x_queries, data[j][i][2], label=str(params[j][i]) + '_' + algo[j], color=colors[j][i])
-        axs[2+j].set_title('Cost of Solution (' + dataset + ', k = ' + str(k) + ')')
-        axs[2+j].set(xlabel='Updates', ylabel='Cost')
-        axs[2+j].legend()
+        for i in range(len(algos[j])):
+            axs[len(algos)+j].plot(x_queries, data[j][i][2], label=algos[j][i], color=colors[j][i])
+        axs[len(algos)+j].set_title('Cost of Solution (' + dataset + ', k = ' + str(k) + ')')
+        axs[len(algos)+j].set(xlabel='Updates', ylabel='Cost')
+        axs[len(algos)+j].legend()
 
 # construct a page for some value of k
-def get_page(k, alphas, thresholds):
+def get_page(k, algos):
 
     blues = ['#20B2AA', '#00BFFF', '#0000FF']
     reds = ['#FFA500', '#EE82EE', '#FF0000']
 
+    q = len(algos)
+
     page = [
 
-     ['census', k, [alphas, thresholds], ['BCLP', 'HK20'], [blues, reds]],
-     ['song', k, [alphas, thresholds], ['BCLP', 'HK20'], [blues, reds]],
-     ['kddcup', k, [alphas, thresholds], ['BCLP', 'HK20'], [blues, reds]],
+     # ['census', k, algos, [blues , reds]],
+     # ['song', k, algos, [blues , reds]],
+     # ['kddcup', k, algos, [blues , reds]],
 
-     # ['census', k, thresholds, 'HK20', reds],
-     # ['song', k, alphas, 'BCLP', blues],
-     # ['song', k, thresholds, 'HK20', reds],
-     # ['kddcup', k, alphas, 'BCLP', blues],
-     # ['kddcup', k, thresholds, 'HK20', reds]
+     ['census', k, algos, [['#0000FF' , '#FF0000']]],
+     ['song', k, algos, [['#0000FF' , '#FF0000']]],
+     ['kddcup', k, algos, [['#0000FF' , '#FF0000']]],
 
     ]
 
     return page
 
-def get_pages(kValues, alphas, thresholds):
+def get_pages(kValues, algos):
 
     pages = []
     for k in kValues:
-        pages = pages + [get_page(k, alphas, thresholds)]
+        pages = pages + [get_page(k, algos)]
 
     return pages
 
 if __name__ == '__main__':
 
-    alphas = [250, 500, 1000]
-    thresholds = [250, 500, 1000]
+    # bclp_algos = ['250_BCLP', '500_BCLP', '1000_BCLP']
+    # hk20_algos = ['250_HK20', '500_HK20', '1000_HK20']
+    #
+    # plot_data(get_pages([50], [bclp_algos , hk20_algos]), 'results_justification/')
 
-    plot_data(get_pages([50], alphas, thresholds,), 'results_justification/')
+    plot_data(get_pages([50], [['1000_BCLP', '1000_HK20']]), 'results/')
