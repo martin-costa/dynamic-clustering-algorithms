@@ -186,26 +186,32 @@ public class Test {
     String[] datasets = {kddcup, census, song};
 
     for (int k : kValues) {
+
       for (String dataset : datasets) {
 
-        DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[alphaValues.length + mValues.length];
+        if (k != 10 || dataset == song) {
 
-        for (int i = 0; i < alphaValues.length; i++) {
-          dynamicAlgorithms[i] = new DynamicMP(k, metric, alphaValues[i], beta, epsilon);
+          DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[alphaValues.length + mValues.length];
+
+          for (int i = 0; i < alphaValues.length; i++) {
+            dynamicAlgorithms[i] = new DynamicMP(k, metric, alphaValues[i], beta, epsilon);
+          }
+
+          for (int i = 0; i < mValues.length; i++) {
+            dynamicAlgorithms[i + alphaValues.length] = new HenzingerTree(k, metric, mValues[i]);
+          }
+
+          SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
+
+          System.out.println("----------------");
+          System.out.println("Dataset: " + dataset);
+          System.out.print("k: ");
+          System.out.println(k);
+          System.out.println("----------------");
+          runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+
         }
 
-        for (int i = 0; i < mValues.length; i++) {
-          dynamicAlgorithms[i + alphaValues.length] = new HenzingerTree(k, metric, mValues[i]);
-        }
-
-        SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
-
-        System.out.println("----------------");
-        System.out.println("Dataset: " + dataset);
-        System.out.print("k: ");
-        System.out.println(k);
-        System.out.println("----------------");
-        runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
       }
     }
   }
