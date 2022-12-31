@@ -183,7 +183,7 @@ public class Test {
     float beta = 0.5f;
     float epsilon = 0.2f;
 
-    String[] datasets = {census, song, kddcup};
+    String[] datasets = {kddcup, census, song};
 
     for (int k : kValues) {
       for (String dataset : datasets) {
