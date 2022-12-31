@@ -30,23 +30,23 @@ def amortize(values):
 
     return values
 
-def load_data_single(dataset, k, param, algo):
+def load_data_single(dataset, k, param, algo, dir='results/'):
 
-    update_times = load_file('results/' + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_updatetime', nano_to_seconds)
-    query_times = load_file('results/' + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_querytime', nano_to_seconds)
+    update_times = load_file(dir + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_updatetime', nano_to_seconds)
+    query_times = load_file(dir + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_querytime', nano_to_seconds)
     query_times = amortize(query_times)
-    costs = load_file('results/' + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_cost', float)
+    costs = load_file(dir + dataset + '_' + str(k) + '_' + str(param) + '_' + algo + '_cost', float)
 
     return update_times, query_times, costs
 
 # create a plot for dataset and k
-def plot_data(pages):
+def plot_data(pages, dir='results/'):
 
     # stores the figures for each page
     figs = []
 
     for page in pages:
-        figs = figs + [plot_data_page(page)]
+        figs = figs + [plot_data_page(page, dir)]
 
     with PdfPages('test_results.pdf') as pdf:
 
@@ -57,12 +57,12 @@ def plot_data(pages):
     plt.show()
 
 # create a plot for dataset and k
-def plot_data_page(page):
+def plot_data_page(page, dir='results/'):
 
-    fig, axs = plt.subplots(len(page), 3, figsize=(18, 5*len(page)))
+    fig, axs = plt.subplots(len(page), 4, figsize=(6*4, 5*len(page)))
 
     for i in range(len(page)):
-        plot_data_row(axs[i], page[i][0], page[i][1], page[i][2], page[i][3], page[i][4])
+        plot_data_row_2(axs[i], page[i][0], page[i][1], page[i][2], page[i][3], page[i][4], dir)
 
     fig.tight_layout()
 
@@ -105,6 +105,39 @@ def plot_data_row(axs, dataset, k, params, algo, colors):
 
     # plt.suptitle('dataset = ' + dataset + ', k = ' + str(k) + ', ' + str(n) + ' updates, ' + str(q) + ' queries')
 
+# create a plot for dataset and k
+def plot_data_row_2(axs, dataset, k, params, algo, colors, dir='results/'):
+
+    data = [[], []]
+
+    for p in params[0]:
+        data[0] = data[0] + [load_data_single(dataset, k, p, algo[0], dir)]
+
+    for p in params[1]:
+        data[1] = data[1] + [load_data_single(dataset, k, p, algo[1], dir)]
+
+    n = len(data[0][0][0])
+    q = len(data[0][0][1])
+
+    x_updates = np.linspace(1, n, n)
+    x_queries = np.linspace(1, n, q)
+
+    for j in range(2):
+
+        # update times
+        for i in range(len(params[j])):
+            axs[j].plot(x_updates, data[j][i][0], label=str(params[j][i]) + '_' + algo[j], color=colors[j][i])
+        axs[j].set_title('Total Update Time (' + dataset + ', k = ' + str(k) + ')')
+        axs[j].set(xlabel='Updates', ylabel='Total Update Time (sec)')
+        axs[j].legend()
+
+        # costs
+        for i in range(len(params[j])):
+            axs[2+j].plot(x_queries, data[j][i][2], label=str(params[j][i]) + '_' + algo[j], color=colors[j][i])
+        axs[2+j].set_title('Cost of Solution (' + dataset + ', k = ' + str(k) + ')')
+        axs[2+j].set(xlabel='Updates', ylabel='Cost')
+        axs[2+j].legend()
+
 # construct a page for some value of k
 def get_page(k, alphas, thresholds):
 
@@ -113,12 +146,15 @@ def get_page(k, alphas, thresholds):
 
     page = [
 
-     ['census', k, alphas, 'BCLP', blues],
-     ['census', k, thresholds, 'HK20', reds],
-     ['song', k, alphas, 'BCLP', blues],
-     ['song', k, thresholds, 'HK20', reds],
-     ['kddcup', k, alphas, 'BCLP', blues],
-     ['kddcup', k, thresholds, 'HK20', reds]
+     ['census', k, [alphas, thresholds], ['BCLP', 'HK20'], [blues, reds]],
+     ['song', k, [alphas, thresholds], ['BCLP', 'HK20'], [blues, reds]],
+     ['kddcup', k, [alphas, thresholds], ['BCLP', 'HK20'], [blues, reds]],
+
+     # ['census', k, thresholds, 'HK20', reds],
+     # ['song', k, alphas, 'BCLP', blues],
+     # ['song', k, thresholds, 'HK20', reds],
+     # ['kddcup', k, alphas, 'BCLP', blues],
+     # ['kddcup', k, thresholds, 'HK20', reds]
 
     ]
 
@@ -137,4 +173,4 @@ if __name__ == '__main__':
     alphas = [250, 500, 1000]
     thresholds = [250, 500, 1000]
 
-    plot_data(get_pages([10, 50, 100], alphas, thresholds))
+    plot_data(get_pages([50], alphas, thresholds,), 'results_justification/')
