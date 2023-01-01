@@ -59,7 +59,7 @@ def plot_data(pages, dir='results/'):
 # create a plot for dataset and k
 def plot_data_page(page, dir='results/'):
 
-    fig, axs = plt.subplots(len(page), 2*len(page[0][2]), figsize=(6*2*len(page[0][2]), 5*len(page)))
+    fig, axs = plt.subplots(len(page), 3*len(page[0][2]), figsize=(6*3*len(page[0][2]), 5*len(page)))
 
     for i in range(len(page)):
         plot_data_row_2(axs[i], page[i][0], page[i][1], page[i][2], page[i][3], dir)
@@ -98,6 +98,13 @@ def plot_data_row_2(axs, dataset, k, algos, colors, dir='results/'):
         axs[len(algos)+j].set_title('Cost of Solution (' + dataset + ', k = ' + str(k) + ')')
         axs[len(algos)+j].set(xlabel='Updates', ylabel='Cost')
         axs[len(algos)+j].legend()
+
+        # query times
+        for i in range(len(algos[j])):
+            axs[2*len(algos)+j].plot(x_queries, data[j][i][1], label=algos[j][i], color=colors[j][i])
+        axs[2*len(algos)+j].set_title('Average Query Time (' + dataset + ', k = ' + str(k) + ')')
+        axs[2*len(algos)+j].set(xlabel='Updates', ylabel='Average Query Time (sec)')
+        axs[2*len(algos)+j].legend()
 
 # construct a page for some value of k
 def get_page(k, algos):
