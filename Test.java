@@ -70,7 +70,7 @@ public class Test {
 
     */
 
-    int[] kValues = { 10, 50, 100 };
+    int[] kValues = { 100 };
     float[] alphaValues = { 1000 };
     int[] mValues = { 1000 };
 
@@ -189,7 +189,7 @@ public class Test {
 
       for (String dataset : datasets) {
 
-        if (k != 10 || dataset == song) {
+        if (dataset != kddcup) {
 
           DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[alphaValues.length + mValues.length];
 
