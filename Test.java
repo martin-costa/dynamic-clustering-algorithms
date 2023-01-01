@@ -47,7 +47,7 @@ public class Test {
     Metric metric = new LpNorm(2, 1.0f/n);
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, 3000);
 
     float beta = 0.5f;
     float epsilon = 0.0f;
