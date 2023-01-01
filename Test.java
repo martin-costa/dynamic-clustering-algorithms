@@ -49,7 +49,7 @@ public class Test {
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
 
-    float beta = 0.0f;
+    float beta = 0.01f;
     float epsilon = 0.2f;
 
     DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[6];
