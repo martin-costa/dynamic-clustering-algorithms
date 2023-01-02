@@ -35,7 +35,7 @@ public class Test {
     int k = 50;
 
     // set the window length
-    int windowLength = 4000;
+    int windowLength = 2000;
 
     // create un update stream of length n
     int n = 10000;
@@ -56,11 +56,11 @@ public class Test {
 
     // dynamicAlgorithms[0] = new DynamicMP(k, metric, 250, beta, epsilon);
     // dynamicAlgorithms[1] = new DynamicMP(k, metric, 500, beta, epsilon);
-    dynamicAlgorithms[0] = new DynamicMP(k, metric, 2000, beta, epsilon);
+    dynamicAlgorithms[0] = new DynamicMP(k, metric, 1000, beta, epsilon);
 
     // dynamicAlgorithms[3] = new HenzingerTree(k, metric, 250);
     // dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
-    dynamicAlgorithms[1] = new HenzingerTree(k, metric, 2000);
+    dynamicAlgorithms[1] = new HenzingerTree(k, metric, 1000);
 
     runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
 
