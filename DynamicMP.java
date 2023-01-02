@@ -261,6 +261,7 @@ public class DynamicMP extends DynamicAlgorithm {
             assignment[i] = j;
           }
         }
+        weights[assignment[i]]++;
         continue;
       }
 
@@ -278,12 +279,11 @@ public class DynamicMP extends DynamicAlgorithm {
 
     // set weights
     for (int i = 0; i < m; i++) {
-      weights[i]++;
       layerSamples.put(layerSamplesArr[i], (float)weights[i]);
     }
 
     // compute the value nu
-    Arrays.sort(dist);
+    Arrays.sort(dist.clone());
     float nu = dist[(int)Math.ceil(n*this.beta)]; // USE LINEAR SEARCH FOR O(log n) SPEEDUP!!
 
     // compute the clustering at this layer and create new layer of unclustered points
