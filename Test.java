@@ -52,15 +52,15 @@ public class Test {
     float beta = 0.5f;
     float epsilon = 0.2f;
 
-    DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[6];
+    DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[2];
 
     // dynamicAlgorithms[0] = new DynamicMP(k, metric, 250, beta, epsilon);
     // dynamicAlgorithms[1] = new DynamicMP(k, metric, 500, beta, epsilon);
-    dynamicAlgorithms[2] = new DynamicMP(k, metric, 2000, beta, epsilon);
+    dynamicAlgorithms[0] = new DynamicMP(k, metric, 2000, beta, epsilon);
 
     // dynamicAlgorithms[3] = new HenzingerTree(k, metric, 250);
     // dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
-    dynamicAlgorithms[5] = new HenzingerTree(k, metric, 2000);
+    dynamicAlgorithms[1] = new HenzingerTree(k, metric, 2000);
 
     runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
 
