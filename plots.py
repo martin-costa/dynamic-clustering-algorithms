@@ -90,6 +90,7 @@ def plot_data_row_2(axs, dataset, k, algos, colors, dir='results/'):
             axs[j].plot(x_updates, data[j][i][0], label=algos[j][i], color=colors[j][i])
         axs[j].set_title('Total Update Time (' + dataset + ', k = ' + str(k) + ')')
         axs[j].set(xlabel='Updates', ylabel='Total Update Time (sec)')
+        axs[j].set_yscale('log')
         axs[j].legend()
 
         # costs
@@ -116,13 +117,14 @@ def get_page(k, algos):
 
     page = [
 
-     # ['census', k, algos, [blues, reds]],
-     # ['song', k, algos, [blues, reds]],
-     # ['kddcup', k, algos, [blues, reds]],
+     ['census', k, algos, [blues + reds]],
+     ['song', k, algos, [blues + reds]],
+     ['kddcup', k, algos, [blues + reds]],
 
-     ['census', k, algos, [['#0000FF' , '#FF0000']]],
-     # ['song', k, algos, [['#0000FF' , '#FF0000']]],
-     ['kddcup', k, algos, [['#0000FF' , '#FF0000']]],
+
+     # ['census', k, algos, [['#0000FF' , '#FF0000']]],
+     # # ['song', k, algos, [['#0000FF' , '#FF0000']]],
+     # ['kddcup', k, algos, [['#0000FF' , '#FF0000']]],
 
     ]
 
@@ -138,9 +140,9 @@ def get_pages(kValues, algos):
 
 if __name__ == '__main__':
 
-    # bclp_algos = ['250_BCLP', '500_BCLP', '1000_BCLP']
-    # hk20_algos = ['250_HK20', '500_HK20', '1000_HK20']
-    #
-    # plot_data(get_pages([50], [bclp_algos, hk20_algos]), 'results_justification/')
+    bclp_algos = ['250_BCLP', '500_BCLP', '1000_BCLP']
+    hk20_algos = ['250_HK20', '500_HK20', '1000_HK20']
 
-    plot_data(get_pages([10, 50, 100], [['1000_BCLP', '1000_HK20']]), 'results/')
+    plot_data(get_pages([50], [bclp_algos + hk20_algos]), 'results_justification/')
+
+    # plot_data(get_pages([10, 50, 100], [['1000_BCLP', '1000_HK20']]), 'results/')

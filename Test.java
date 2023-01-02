@@ -70,11 +70,11 @@ public class Test {
 
     */
 
-    int[] kValues = { 50 };
-    float[] alphaValues = { 250, 500, 1000 };
-    int[] mValues = { 250, 500, 1000 };
+    int[] kValues = { 10, 50, 100 };
+    float[] alphaValues = { 500 };
+    int[] mValues = { 1000 };
 
-    runBatchTests(3000, 2000, 100, kValues, alphaValues, mValues, metric);
+    runBatchTests(10000, 2000, 100, kValues, alphaValues, mValues, metric);
   }
 
   // run tests on many algorithmss
