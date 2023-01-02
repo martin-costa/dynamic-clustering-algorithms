@@ -345,8 +345,9 @@ public class DynamicMP extends DynamicAlgorithm {
 
     for (Integer key : finalLayer) {
       coresetWeights.put(key, 1.0f);
-      System.out.println(finalLayer.length);
     }
+
+    System.out.println(finalLayer.length);
 
     // create a map of the actual points
     TreeMap<Integer, float[]> coresetPoints = new TreeMap<Integer, float[]>();
