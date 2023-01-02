@@ -334,12 +334,6 @@ public class DynamicMP extends DynamicAlgorithm {
 
     TreeMap<Integer, Float> coresetWeights = new TreeMap<Integer, Float>();
 
-    // place the samples from each layer into the map
-    for (int i = 0; i < samples.size(); i++) {
-      coresetWeights.putAll(samples.get(i));
-      System.out.println(samples.get(i).size());
-    }
-
     // add final unsampled layer
     Integer[] finalLayer = layers.getLast().keySet().toArray(new Integer[0]);
 
@@ -347,7 +341,15 @@ public class DynamicMP extends DynamicAlgorithm {
       coresetWeights.put(key, 1.0f);
     }
 
+    // place the samples from each layer into the map
+    for (int i = 0; i < samples.size(); i++) {
+      coresetWeights.putAll(samples.get(i));
+      System.out.println(samples.get(i).size());
+    }
+
     System.out.println(finalLayer.length);
+
+    System.out.println(coresetWeights.size());
 
     // create a map of the actual points
     TreeMap<Integer, float[]> coresetPoints = new TreeMap<Integer, float[]>();
@@ -357,8 +359,6 @@ public class DynamicMP extends DynamicAlgorithm {
     for (Integer key : coresetPointsArr) {
       coresetPoints.put(key, space.get(key));
     }
-
-    System.out.println(coresetPoints.size());
 
     System.out.println("---- NEXT -----");
 
