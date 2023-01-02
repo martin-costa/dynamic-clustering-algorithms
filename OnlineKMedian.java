@@ -188,8 +188,6 @@ public class OnlineKMedian {
       clusteringCost += distFromMedians[j]*weightsArr[j];
     }
 
-    System.out.println(clusteringCost);
-
     return solution;
   }
 

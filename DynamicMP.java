@@ -337,6 +337,7 @@ public class DynamicMP extends DynamicAlgorithm {
     // place the samples from each layer into the map
     for (int i = 0; i < samples.size(); i++) {
       coresetWeights.putAll(samples.get(i));
+      System.out.println(samples.get(i).size());
     }
 
     // add final unsampled layer
@@ -344,6 +345,7 @@ public class DynamicMP extends DynamicAlgorithm {
 
     for (Integer key : finalLayer) {
       coresetWeights.put(key, 1.0f);
+      System.out.println(finalLayer.length);
     }
 
     // create a map of the actual points
@@ -354,6 +356,10 @@ public class DynamicMP extends DynamicAlgorithm {
     for (Integer key : coresetPointsArr) {
       coresetPoints.put(key, space.get(key));
     }
+
+    System.out.println(coresetPoints.size());
+
+    System.out.println("");
 
     // call the static algorithm on the coreset
     OnlineKMedian staticAlgo = new OnlineKMedian(k, metric);
