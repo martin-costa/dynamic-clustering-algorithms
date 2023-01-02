@@ -337,11 +337,11 @@ public class DynamicMP extends DynamicAlgorithm {
     // add final unsampled layer
     Integer[] finalLayer = layers.getLast().keySet().toArray(new Integer[0]);
 
-    // for (Integer key : finalLayer) {
-    //   coresetWeights.put(key, 1.0f);
-    // }
-    //
-    // System.out.println(finalLayer.length);
+    for (Integer key : finalLayer) {
+      coresetWeights.put(key, 1.0f);
+    }
+
+    System.out.println(finalLayer.length);
 
     // place the samples from each layer into the map
     for (int i = 0; i < samples.size(); i++) {
