@@ -335,7 +335,7 @@ public class DynamicMP extends DynamicAlgorithm {
     TreeMap<Integer, Float> coresetWeights = new TreeMap<Integer, Float>();
 
     // add final unsampled layer
-    Integer[] finalLayer = layers.getLast().keySet().toArray(new Integer[0]);
+    Integer[] finalLayer = space.keySet().toArray(new Integer[0]);
 
     for (Integer key : finalLayer) {
       coresetWeights.put(key, 1.0f);
