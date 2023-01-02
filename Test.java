@@ -62,7 +62,7 @@ public class Test {
     // dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
     dynamicAlgorithms[1] = new HenzingerTree(k, metric, 1000);
 
-    runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+    //runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
 
     /*
 
@@ -70,11 +70,11 @@ public class Test {
 
     */
 
-    int[] kValues = { 100 };
+    int[] kValues = { 10, 50, 100 };
     float[] alphaValues = { 1000 };
     int[] mValues = { 1000 };
 
-    //runBatchTests(10000, 2000, 100, kValues, alphaValues, mValues, metric);
+    runBatchTests(10000, 5000, 200, kValues, alphaValues, mValues, metric);
   }
 
   // run tests on many algorithmss
@@ -189,28 +189,24 @@ public class Test {
 
       for (String dataset : datasets) {
 
-        if (dataset != kddcup) {
+        DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[alphaValues.length + mValues.length];
 
-          DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[alphaValues.length + mValues.length];
-
-          for (int i = 0; i < alphaValues.length; i++) {
-            dynamicAlgorithms[i] = new DynamicMP(k, metric, alphaValues[i], beta, epsilon);
-          }
-
-          for (int i = 0; i < mValues.length; i++) {
-            dynamicAlgorithms[i + alphaValues.length] = new HenzingerTree(k, metric, mValues[i]);
-          }
-
-          SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
-
-          System.out.println("----------------");
-          System.out.println("Dataset: " + dataset);
-          System.out.print("k: ");
-          System.out.println(k);
-          System.out.println("----------------");
-          runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
-
+        for (int i = 0; i < alphaValues.length; i++) {
+          dynamicAlgorithms[i] = new DynamicMP(k, metric, alphaValues[i], beta, epsilon);
         }
+
+        for (int i = 0; i < mValues.length; i++) {
+          dynamicAlgorithms[i + alphaValues.length] = new HenzingerTree(k, metric, mValues[i]);
+        }
+
+        SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
+
+        System.out.println("----------------");
+        System.out.println("Dataset: " + dataset);
+        System.out.print("k: ");
+        System.out.println(k);
+        System.out.println("----------------");
+        runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
 
       }
     }
