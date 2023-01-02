@@ -342,10 +342,10 @@ public class DynamicMP extends DynamicAlgorithm {
     }
 
     // place the samples from each layer into the map
-    for (int i = 0; i < samples.size(); i++) {
-      coresetWeights.putAll(samples.get(i));
-      System.out.println(samples.get(i).size());
-    }
+    // for (int i = 0; i < samples.size(); i++) {
+    //   coresetWeights.putAll(samples.get(i));
+    //   System.out.println(samples.get(i).size());
+    // }
 
     System.out.println(finalLayer.length);
 
