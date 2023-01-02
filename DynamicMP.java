@@ -255,7 +255,7 @@ public class DynamicMP extends DynamicAlgorithm {
 
       // is this is a sampled point, assign to itself
       if (layerSamples.containsKey(points[i])) {
-        dist[i] = 0;
+        dist[i] = this.metric.d(this.space.get(points[i]), this.space.get(points[i]));
         for (int j = 0; j < m; j++) {
           if (layerSamplesArr[j].equals(points[i])) {
             assignment[i] = j;
