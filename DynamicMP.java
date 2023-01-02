@@ -335,21 +335,16 @@ public class DynamicMP extends DynamicAlgorithm {
     TreeMap<Integer, Float> coresetWeights = new TreeMap<Integer, Float>();
 
     // add final unsampled layer
-    Integer[] finalLayer = space.keySet().toArray(new Integer[0]);
+    Integer[] finalLayer = layers.getLast().keySet().toArray(new Integer[0]);
 
     for (Integer key : finalLayer) {
       coresetWeights.put(key, 1.0f);
     }
 
-    System.out.println(finalLayer.length);
-
     // place the samples from each layer into the map
     for (int i = 0; i < samples.size(); i++) {
       coresetWeights.putAll(samples.get(i));
-      System.out.println(samples.get(i).size());
     }
-
-    System.out.println(coresetWeights.size());
 
     // create a map of the actual points
     TreeMap<Integer, float[]> coresetPoints = new TreeMap<Integer, float[]>();
@@ -359,8 +354,6 @@ public class DynamicMP extends DynamicAlgorithm {
     for (Integer key : coresetPointsArr) {
       coresetPoints.put(key, space.get(key));
     }
-
-    System.out.println("---- NEXT -----");
 
     // call the static algorithm on the coreset
     OnlineKMedian staticAlgo = new OnlineKMedian(k, metric);

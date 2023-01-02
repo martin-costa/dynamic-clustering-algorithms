@@ -238,6 +238,11 @@ public class Test {
         if (d <= dist) dist = d;
       }
 
+      if (dist > 50) {
+        System.out.println(dist);
+        System.out.println(pointsArr[i]);
+      }
+
       cost += dist;
     }
 
