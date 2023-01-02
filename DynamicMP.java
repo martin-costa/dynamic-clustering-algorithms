@@ -283,8 +283,9 @@ public class DynamicMP extends DynamicAlgorithm {
     }
 
     // compute the value nu
-    Arrays.sort(dist.clone());
-    float nu = dist[(int)Math.ceil(n*this.beta)]; // USE LINEAR SEARCH FOR O(log n) SPEEDUP!!
+    float[] distCopy = dist.clone();
+    Arrays.sort(distCopy);
+    float nu = distCopy[(int)Math.ceil(n*this.beta)]; // USE LINEAR SEARCH FOR O(log n) SPEEDUP!!
 
     // compute the clustering at this layer and create new layer of unclustered points
     @SuppressWarnings("unchecked")
