@@ -38,6 +38,7 @@ class LpNorm extends Metric {
     }
 
     float d = (float)Math.pow(sum, 1.0/(double)p);
+
     return d + noise;
   }
 }

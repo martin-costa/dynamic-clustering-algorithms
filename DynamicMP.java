@@ -253,6 +253,13 @@ public class DynamicMP extends DynamicAlgorithm {
 
     for (int i = 0; i < n; i++) {
 
+      // is this is a sampled point, assign to itself
+      if (layerSamples.containsKey(points[i])) {
+        dist[i] = 0;
+        assignment[i] = i;
+        continue;
+      }
+
       dist[i] = Float.POSITIVE_INFINITY;
       assignment[i] = 0;
       for (int j = 0; j < m; j++) {
@@ -267,8 +274,8 @@ public class DynamicMP extends DynamicAlgorithm {
 
     // set weights
     for (int i = 0; i < m; i++) {
-      layerSamples.put(layerSamplesArr[i], (float)weights[i] + 1);
-      //System.out.println((float)weights[i]);
+      weights[i]++;
+      layerSamples.put(layerSamplesArr[i], (float)weights[i]);
     }
 
     // compute the value nu
