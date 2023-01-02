@@ -359,7 +359,7 @@ public class DynamicMP extends DynamicAlgorithm {
 
     System.out.println(coresetPoints.size());
 
-    System.out.println("");
+    System.out.println("---- NEXT -----");
 
     // call the static algorithm on the coreset
     OnlineKMedian staticAlgo = new OnlineKMedian(k, metric);
