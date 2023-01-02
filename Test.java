@@ -44,7 +44,7 @@ public class Test {
     int queryCount = 100;
 
     // the metric to be used
-    Metric metric = new LpNorm(2, 1.0f/n);
+    Metric metric = new LpNorm(2, 1.0f);
 
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, 3000);
