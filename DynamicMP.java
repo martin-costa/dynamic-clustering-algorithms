@@ -286,8 +286,6 @@ public class DynamicMP extends DynamicAlgorithm {
     Arrays.sort(dist);
     float nu = dist[(int)Math.ceil(n*this.beta)]; // USE LINEAR SEARCH FOR O(log n) SPEEDUP!!
 
-    System.out.println(nu);
-
     // compute the clustering at this layer and create new layer of unclustered points
     @SuppressWarnings("unchecked")
     TreeMap<Integer, Integer>[] layerClustering = new TreeMap[m];
@@ -337,7 +335,7 @@ public class DynamicMP extends DynamicAlgorithm {
     TreeMap<Integer, Float> coresetWeights = new TreeMap<Integer, Float>();
 
     // place the samples from each layer into the map
-    for (int i = 0; i < depth()-1; i++) {
+    for (int i = 0; i < samples.size(); i++) {
       coresetWeights.putAll(samples.get(i));
     }
 
