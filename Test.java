@@ -35,7 +35,7 @@ public class Test {
     int k = 50;
 
     // set the window length
-    int windowLength = 2000;
+    int windowLength = 4000;
 
     // create un update stream of length n
     int n = 10000;
@@ -44,7 +44,7 @@ public class Test {
     int queryCount = 100;
 
     // the metric to be used
-    Metric metric = new LpNorm(2, 1.0f);
+    Metric metric = new LpNorm(2, 1.0f/n);
 
     // create update stream
     SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, 3000);
@@ -54,13 +54,13 @@ public class Test {
 
     DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[6];
 
-    dynamicAlgorithms[0] = new DynamicMP(k, metric, 250, beta, epsilon);
-    dynamicAlgorithms[1] = new DynamicMP(k, metric, 500, beta, epsilon);
-    dynamicAlgorithms[2] = new DynamicMP(k, metric, 1000, beta, epsilon);
+    // dynamicAlgorithms[0] = new DynamicMP(k, metric, 250, beta, epsilon);
+    // dynamicAlgorithms[1] = new DynamicMP(k, metric, 500, beta, epsilon);
+    dynamicAlgorithms[2] = new DynamicMP(k, metric, 2000, beta, epsilon);
 
-    dynamicAlgorithms[3] = new HenzingerTree(k, metric, 250);
-    dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
-    dynamicAlgorithms[5] = new HenzingerTree(k, metric, 1000);
+    // dynamicAlgorithms[3] = new HenzingerTree(k, metric, 250);
+    // dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
+    dynamicAlgorithms[5] = new HenzingerTree(k, metric, 2000);
 
     runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
 
