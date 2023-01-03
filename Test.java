@@ -70,7 +70,7 @@ public class Test {
 
     */
 
-    int[] kValues = { 10, 50, 100 };
+    int[] kValues = { 100 };
     float[] alphaValues = { 500 };
     int[] mValues = { 1000 };
 
@@ -183,7 +183,7 @@ public class Test {
     float beta = 0.5f;
     float epsilon = 0.2f;
 
-    String[] datasets = {kddcup, census, song};
+    String[] datasets = {kddcup, song};
 
     for (int k : kValues) {
 
