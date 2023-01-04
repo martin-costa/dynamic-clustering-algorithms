@@ -117,11 +117,10 @@ def get_page(k, algos):
 
     page = [
 
-     # ['census', k, algos, [blues + reds]],
-     # ['song', k, algos, [blues + reds]],
+     ['census', k, algos, [blues + reds]],
+     ['song', k, algos, [blues + reds]],
      ['kddcup', k, algos, [blues + reds]],
-     ['kddcup', k, algos, [blues + reds]],
-     
+
 
 
      # ['census', k, algos, [['#0000FF'] + ['#FF0000']]],
