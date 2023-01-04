@@ -32,13 +32,31 @@ class SlidingWindow extends UpdateStreamGenerator {
   // stores the dimension of the data
   private int d;
 
-  SlidingWindow(int n, int windowLength, String path, int offset) {
+  // permutation of points
+  private int[] perm;
+
+  SlidingWindow(int n, int windowLength, String path, boolean randomOrder, int offset) {
 
     this.n = n;
     this.windowLength = windowLength;
 
+    // generate the permutation of points
+    generatePermutation(randomOrder);
+
     // load the data
     this.loadData(path, offset);
+  }
+
+  SlidingWindow(int n, int windowLength, String path, boolean randomOrder) {
+
+    this.n = n;
+    this.windowLength = windowLength;
+
+    // generate the permutation of points
+    generatePermutation(randomOrder);
+
+    // load the data
+    this.loadData(path, 0);
   }
 
   SlidingWindow(int n, int windowLength, String path) {
@@ -46,13 +64,16 @@ class SlidingWindow extends UpdateStreamGenerator {
     this.n = n;
     this.windowLength = windowLength;
 
+    // generate the permutation of points
+    generatePermutation(false);
+
     // load the data
     this.loadData(path, 0);
   }
 
   // returns the data point in update i
   public float[] point(int i) {
-    return this.data[this.key(i)];
+    return this.data[this.perm[this.key(i)]];
   }
 
   // returns the (unique) key corresponding to the data point in update i
@@ -118,6 +139,33 @@ class SlidingWindow extends UpdateStreamGenerator {
 
     // close the scanner
     scanner.close();
+  }
+
+  // generate a permutation of the points u.a.r
+  private void generatePermutation(boolean randomOrder) {
+
+    // create new array and place interegers 0 to n-1
+    Integer[] permArray = new Integer[n];
+    for (int i = 0; i < n; i++) {
+      permArray[i] = i;
+    }
+
+    if (!randomOrder) {
+      return;
+    }
+
+    // shuffle the contents of the array
+    List<Integer> permList = Arrays.asList(permArray);
+
+		Collections.shuffle(permList);
+    
+    permList.toArray(permArray);
+
+    // place into perm
+    this.perm = new int[n];
+    for (int i = 0; i < n; i++) {
+      perm[i] = permArray[i];
+    }
   }
 
   // check if there is an update i

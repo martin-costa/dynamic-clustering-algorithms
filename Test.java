@@ -47,7 +47,7 @@ public class Test {
     Metric metric = new LpNorm(2, 1.0f/n);
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, 3000);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, false, 3000);
 
     float beta = 0.5f;
     float epsilon = 0.2f;
@@ -70,11 +70,11 @@ public class Test {
 
     */
 
-    int[] kValues = { 100 };
-    float[] alphaValues = { 500 };
-    int[] mValues = { 1000 };
+    int[] kValues = { 50 };
+    float[] alphaValues = { 250, 500, 1000 };
+    int[] mValues = { 250, 500, 1000 };
 
-    runBatchTests(10000, 2000, 100, kValues, alphaValues, mValues, metric);
+    runBatchTests(3000, 2000, 100, kValues, alphaValues, mValues, metric);
   }
 
   // run tests on many algorithmss
@@ -183,7 +183,7 @@ public class Test {
     float beta = 0.5f;
     float epsilon = 0.2f;
 
-    String[] datasets = {kddcup, song};
+    String[] datasets = {kddcup, song, census};
 
     for (int k : kValues) {
 
@@ -199,7 +199,7 @@ public class Test {
           dynamicAlgorithms[i + alphaValues.length] = new HenzingerTree(k, metric, mValues[i]);
         }
 
-        SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset);
+        SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, true);
 
         System.out.println("----------------");
         System.out.println("Dataset: " + dataset);
