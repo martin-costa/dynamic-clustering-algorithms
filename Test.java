@@ -32,13 +32,13 @@ public class Test {
     String dataset = kddcup;
 
     // parameter k
-    int k = 50;
+    int k = 10;
 
     // set the window length
     int windowLength = 2000;
 
     // create un update stream of length n
-    int n = 10000;
+    int n = 3000;
 
     // number of queries to perform over the stream
     int queryCount = 100;
@@ -47,7 +47,7 @@ public class Test {
     Metric metric = new LpNorm(2, 1.0f/n);
 
     // create update stream
-    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, false, 3000);
+    SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, true);
 
     float beta = 0.5f;
     float epsilon = 0.2f;
@@ -55,14 +55,14 @@ public class Test {
     DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[2];
 
     // dynamicAlgorithms[0] = new DynamicMP(k, metric, 250, beta, epsilon);
-    // dynamicAlgorithms[1] = new DynamicMP(k, metric, 500, beta, epsilon);
-    dynamicAlgorithms[0] = new DynamicMP(k, metric, 1000, beta, epsilon);
+    dynamicAlgorithms[1] = new DynamicMP(k, metric, 500, beta, epsilon);
+    // dynamicAlgorithms[0] = new DynamicMP(k, metric, 1000, beta, epsilon);
 
     // dynamicAlgorithms[3] = new HenzingerTree(k, metric, 250);
     // dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
     dynamicAlgorithms[1] = new HenzingerTree(k, metric, 1000);
 
-    //runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+    runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
 
     /*
 
@@ -74,7 +74,7 @@ public class Test {
     float[] alphaValues = { 500 };
     int[] mValues = { 1000 };
 
-    runBatchTests(10000, 2000, 100, kValues, alphaValues, mValues, metric);
+    //runBatchTests(10000, 2000, 100, kValues, alphaValues, mValues, metric);
   }
 
   // run tests on many algorithmss
@@ -131,8 +131,8 @@ public class Test {
         updateTimes[j] += System.nanoTime() - s;
       }
 
-      // perform query every queryFrequency updates
-      if (i % queryFrequency == 0) {
+      // perform query every queryFrequency updates (or on the last one)
+      if (i % queryFrequency == 0 || i == updateStream.streamLength() - 1) {
 
         for (int j = 0; j < l; j++) {
 

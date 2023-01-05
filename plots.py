@@ -117,15 +117,15 @@ def get_page(k, algos):
 
     page = [
 
-     ['census', k, algos, [blues + reds]],
-     ['song', k, algos, [blues + reds]],
-     ['kddcup', k, algos, [blues + reds]],
+     # ['census', k, algos, [blues + reds]],
+     # ['song', k, algos, [blues + reds]],
+     # ['kddcup', k, algos, [blues + reds]],
 
 
 
-     # ['census', k, algos, [['#0000FF'] + ['#FF0000']]],
-     # ['song', k, algos, [['#0000FF'] + ['#FF0000']]],
-     # ['kddcup', k, algos, [['#0000FF'] + ['#FF0000']]],
+     ['census', k, algos, [['#0000FF'] + ['#FF0000']]],
+     ['song', k, algos, [['#0000FF'] + ['#FF0000']]],
+     ['kddcup', k, algos, [['#0000FF'] + ['#FF0000']]],
 
     ]
 
@@ -143,11 +143,11 @@ if __name__ == '__main__':
 
     # print justification
 
-    bclp_algos = ['250_BCLP', '500_BCLP', '1000_BCLP']
-    hk20_algos = ['250_HK20', '500_HK20', '1000_HK20']
-
-    plot_data(get_pages([50], [bclp_algos + hk20_algos]), 'results/')
+    # bclp_algos = ['250_BCLP', '500_BCLP', '1000_BCLP']
+    # hk20_algos = ['250_HK20', '500_HK20', '1000_HK20']
+    #
+    # plot_data(get_pages([50], [bclp_algos + hk20_algos]), 'results_justification_random/')
 
     # print main results
 
-    # plot_data(get_pages([10, 50, 100], [['500_BCLP'] + ['1000_HK20']]), 'results/')
+    plot_data(get_pages([10, 50, 100], [['500_BCLP'] + ['1000_HK20']]), 'results/')
