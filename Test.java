@@ -153,7 +153,7 @@ public class Test {
         updateTimeWriters[j].writeChars(Long.toString(updateTimes[j]) + "#");
       }
 
-      if (i % queryFrequency == 0) {
+      if (i % queryFrequency == 0 || i == updateStream.streamLength() - 1) {
         for (int j = 0; j < l; j++) {
           queryTimeWriters[j].writeChars(Long.toString(queryTimes[j]) + "#");
           costWriters[j].writeChars(Float.toString(costs[j]) + "#");

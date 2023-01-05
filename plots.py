@@ -123,9 +123,11 @@ def get_page(k, algos):
 
 
 
-     ['census', k, algos, [['#0000FF'] + ['#FF0000']]],
-     ['song', k, algos, [['#0000FF'] + ['#FF0000']]],
+     # ['census', k, algos, [['#0000FF'] + ['#FF0000']]],
+     # ['song', k, algos, [['#0000FF'] + ['#FF0000']]],
      ['kddcup', k, algos, [['#0000FF'] + ['#FF0000']]],
+     ['kddcup', k, algos, [['#0000FF'] + ['#FF0000']]],
+
 
     ]
 
@@ -150,4 +152,6 @@ if __name__ == '__main__':
 
     # print main results
 
-    plot_data(get_pages([10, 50, 100], [['500_BCLP'] + ['1000_HK20']]), 'results/')
+    # plot_data(get_pages([10, 50, 100], [['500_BCLP'] + ['1000_HK20']]), 'results/')
+
+    plot_data(get_pages([10], [['500_BCLP'] + ['1000_HK20']]), 'results/')
