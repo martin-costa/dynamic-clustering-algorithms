@@ -55,7 +55,7 @@ public class Test {
     DynamicAlgorithm[] dynamicAlgorithms = new DynamicAlgorithm[2];
 
     // dynamicAlgorithms[0] = new DynamicMP(k, metric, 250, beta, epsilon);
-    dynamicAlgorithms[1] = new DynamicMP(k, metric, 500, beta, epsilon);
+    dynamicAlgorithms[0] = new DynamicMP(k, metric, 500, beta, epsilon);
     // dynamicAlgorithms[0] = new DynamicMP(k, metric, 1000, beta, epsilon);
 
     // dynamicAlgorithms[3] = new HenzingerTree(k, metric, 250);
