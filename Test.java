@@ -32,13 +32,13 @@ public class Test {
     String dataset = kddcup;
 
     // parameter k
-    int k = 10;
+    int k = 50;
 
     // set the window length
-    int windowLength = 2000;
+    int windowLength = 5000;
 
     // create un update stream of length n
-    int n = 3000;
+    int n = 100000;
 
     // number of queries to perform over the stream
     int queryCount = 100;
