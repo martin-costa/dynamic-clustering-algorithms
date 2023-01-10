@@ -62,7 +62,7 @@ public class Test {
     // dynamicAlgorithms[4] = new HenzingerTree(k, metric, 500);
     dynamicAlgorithms[1] = new HenzingerTree(k, metric, 1000);
 
-    runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+    //runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount, "results/");
 
     /*
 
@@ -70,15 +70,23 @@ public class Test {
 
     */
 
-    int[] kValues = { 10, 50, 100 };
-    float[] alphaValues = { 500 };
-    int[] mValues = { 1000 };
+    // justification
+    int[] kValues = { 50 };
+    float[] alphaValues = { 250, 500, 1000 };
+    int[] mValues = { 250, 500, 1000 };
 
-    //runBatchTests(10000, 2000, 100, kValues, alphaValues, mValues, metric);
+    runBatchTests(3000, 2000, 100, kValues, alphaValues, mValues, metric, "results_justification_new/");
+
+    // main
+    int[] kValues1 = { 10, 50, 100 };
+    float[] alphaValues1 = { 500 };
+    int[] mValues1 = { 1000 };
+
+    runBatchTests(10000, 2000, 100, kValues1, alphaValues1, mValues1, metric, "results_main/");
   }
 
   // run tests on many algorithmss
-  public static void runTests(SlidingWindow updateStream, DynamicAlgorithm[] dynamicAlgorithms, Metric metric, String dataset, int queryCount) throws IOException {
+  public static void runTests(SlidingWindow updateStream, DynamicAlgorithm[] dynamicAlgorithms, Metric metric, String dataset, int queryCount, String dir) throws IOException {
 
     // query frequency
     int queryFrequency = (int)(updateStream.streamLength()/queryCount);
@@ -104,9 +112,9 @@ public class Test {
     DataOutputStream[] costWriters = new DataOutputStream[l];
 
     for (int i = 0; i < l; i++) {
-      updateTimeWriters[i] = new DataOutputStream(new FileOutputStream("results/" + dataset + "_" + dynamicAlgorithms[i].name() + "_updatetime"));
-      queryTimeWriters[i] = new DataOutputStream(new FileOutputStream("results/" + dataset + "_" + dynamicAlgorithms[i].name() + "_querytime"));
-      costWriters[i] = new DataOutputStream(new FileOutputStream("results/" + dataset + "_" + dynamicAlgorithms[i].name() + "_cost"));
+      updateTimeWriters[i] = new DataOutputStream(new FileOutputStream(dir + dataset + "_" + dynamicAlgorithms[i].name() + "_updatetime"));
+      queryTimeWriters[i] = new DataOutputStream(new FileOutputStream(dir + dataset + "_" + dynamicAlgorithms[i].name() + "_querytime"));
+      costWriters[i] = new DataOutputStream(new FileOutputStream(dir + dataset + "_" + dynamicAlgorithms[i].name() + "_cost"));
     }
 
     // handle the update stream
@@ -178,7 +186,7 @@ public class Test {
   }
 
   // run the complete tests
-  public static void runBatchTests(int n, int windowLength, int queryCount, int[] kValues, float[] alphaValues, int[] mValues, Metric metric) throws IOException {
+  public static void runBatchTests(int n, int windowLength, int queryCount, int[] kValues, float[] alphaValues, int[] mValues, Metric metric, String dir) throws IOException {
 
     float beta = 0.5f;
     float epsilon = 0.2f;
@@ -199,22 +207,22 @@ public class Test {
           dynamicAlgorithms[i + alphaValues.length] = new HenzingerTree(k, metric, mValues[i]);
         }
 
-        SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, true);
+        SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, false);
 
         System.out.println("----------------");
         System.out.println("Dataset: " + dataset);
         System.out.print("k: ");
         System.out.println(k);
         System.out.println("----------------");
-        runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount);
+        runTests(updateStream, dynamicAlgorithms, metric, dataset, queryCount, dir);
 
       }
     }
   }
 
   // run the complete tests
-  public static void runBatchTests(int[] kValues, float[] alphaValues, int[] mValues, Metric metric) throws IOException {
-    runBatchTests(10000, 2000, 500, kValues, alphaValues, mValues, metric);
+  public static void runBatchTests(int[] kValues, float[] alphaValues, int[] mValues, Metric metric, String dir) throws IOException {
+    runBatchTests(10000, 2000, 500, kValues, alphaValues, mValues, metric, dir);
   }
 
   // compute the cost of solution with respect points with this metric

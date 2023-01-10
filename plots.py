@@ -61,8 +61,11 @@ def plot_data_page(page, dir='results/'):
 
     fig, axs = plt.subplots(len(page), 3*len(page[0][2]), figsize=(6*3*len(page[0][2]), 5*len(page)))
 
-    for i in range(len(page)):
-        plot_data_row_2(axs[i], page[i][0], page[i][1], page[i][2], page[i][3], dir)
+    if len(page) == 1:
+        plot_data_row_2(axs, page[0][0], page[0][1], page[0][2], page[0][3], dir)
+    else:
+        for i in range(len(page)):
+            plot_data_row_2(axs[i], page[i][0], page[i][1], page[i][2], page[i][3], dir)
 
     fig.tight_layout()
 
@@ -126,7 +129,6 @@ def get_page(k, algos):
      # ['census', k, algos, [['#0000FF'] + ['#FF0000']]],
      # ['song', k, algos, [['#0000FF'] + ['#FF0000']]],
      ['kddcup', k, algos, [['#0000FF'] + ['#FF0000']]],
-     ['kddcup', k, algos, [['#0000FF'] + ['#FF0000']]],
 
 
     ]
@@ -154,4 +156,4 @@ if __name__ == '__main__':
 
     # plot_data(get_pages([10, 50, 100], [['500_BCLP'] + ['1000_HK20']]), 'results/')
 
-    plot_data(get_pages([10], [['500_BCLP'] + ['1000_HK20']]), 'results/')
+    plot_data(get_pages([50], [['500_BCLP'] + ['1000_HK20']]), 'results/')

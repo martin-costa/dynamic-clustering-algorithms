@@ -253,17 +253,17 @@ public class DynamicMP extends DynamicAlgorithm {
 
     for (int i = 0; i < n; i++) {
 
-      // is this is a sampled point, assign to itself
-      if (layerSamples.containsKey(points[i])) {
-        dist[i] = this.metric.d(this.space.get(points[i]), this.space.get(points[i]));
-        for (int j = 0; j < m; j++) {
-          if (layerSamplesArr[j].equals(points[i])) {
-            assignment[i] = j;
-          }
-        }
-        weights[assignment[i]]++;
-        continue;
-      }
+      // if this is a sampled point, assign to itself
+      // if (layerSamples.containsKey(points[i])) {
+      //   dist[i] = this.metric.d(this.space.get(points[i]), this.space.get(points[i]));
+      //   for (int j = 0; j < m; j++) {
+      //     if (layerSamplesArr[j].equals(points[i])) {
+      //       assignment[i] = j;
+      //     }
+      //   }
+      //   weights[assignment[i]]++;
+      //   continue;
+      // }
 
       dist[i] = Float.POSITIVE_INFINITY;
       assignment[i] = 0;
