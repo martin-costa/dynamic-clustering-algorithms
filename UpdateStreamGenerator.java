@@ -150,16 +150,14 @@ class SlidingWindow extends UpdateStreamGenerator {
       permArray[i] = i;
     }
 
-    if (!randomOrder) {
-      return;
-    }
-
     // shuffle the contents of the array
-    List<Integer> permList = Arrays.asList(permArray);
+    if (randomOrder) {
+      List<Integer> permList = Arrays.asList(permArray);
 
-		Collections.shuffle(permList);
-    
-    permList.toArray(permArray);
+  		Collections.shuffle(permList);
+
+      permList.toArray(permArray);
+    }
 
     // place into perm
     this.perm = new int[n];
