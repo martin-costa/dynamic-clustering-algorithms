@@ -71,18 +71,24 @@ public class Test {
     */
 
     // justification
-    int[] kValues = { 50 };
-    float[] alphaValues = { 250, 500, 1000 };
-    int[] mValues = { 250, 500, 1000 };
+    int[] kValues_j = { 50 };
+    float[] alphaValues_j = { 250, 500, 1000 };
+    int[] mValues_j = { 250, 500, 1000 };
 
-    runBatchTests(3000, 2000, 100, kValues, alphaValues, mValues, metric, "results_justification_new/");
+    runBatchTests(3000, 2000, 100, kValues_j, alphaValues_j, mValues_j, metric, "justification (data)/", false);
 
-    // main
-    int[] kValues1 = { 10, 50, 100 };
-    float[] alphaValues1 = { 500 };
-    int[] mValues1 = { 1000 };
+    // experiments
+    int[] kValues_e = { 10, 50, 100 };
+    float[] alphaValues_e = { 500 };
+    int[] mValues_e = { 1000 };
 
-    runBatchTests(10000, 2000, 100, kValues1, alphaValues1, mValues1, metric, "results_main/");
+    runBatchTests(10000, 2000, 100, kValues_e, alphaValues_e, mValues_e, metric, "experiments (data)/", false);
+
+    // justification_random
+    runBatchTests(3000, 2000, 100, kValues_j, alphaValues_j, mValues_j, metric, "justification_random (data)/", true);
+
+    // experiments_random
+    runBatchTests(10000, 2000, 100, kValues_e, alphaValues_e, mValues_e, metric, "experiments_random (data)/", true);
   }
 
   // run tests on many algorithmss
@@ -186,7 +192,7 @@ public class Test {
   }
 
   // run the complete tests
-  public static void runBatchTests(int n, int windowLength, int queryCount, int[] kValues, float[] alphaValues, int[] mValues, Metric metric, String dir) throws IOException {
+  public static void runBatchTests(int n, int windowLength, int queryCount, int[] kValues, float[] alphaValues, int[] mValues, Metric metric, String dir, boolean randomOrder) throws IOException {
 
     float beta = 0.5f;
     float epsilon = 0.2f;
@@ -207,7 +213,7 @@ public class Test {
           dynamicAlgorithms[i + alphaValues.length] = new HenzingerTree(k, metric, mValues[i]);
         }
 
-        SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, false);
+        SlidingWindow updateStream = new SlidingWindow(n, windowLength, "../data/" + dataset, randomOrder);
 
         System.out.println("----------------");
         System.out.println("Dataset: " + dataset);
@@ -218,11 +224,6 @@ public class Test {
 
       }
     }
-  }
-
-  // run the complete tests
-  public static void runBatchTests(int[] kValues, float[] alphaValues, int[] mValues, Metric metric, String dir) throws IOException {
-    runBatchTests(10000, 2000, 500, kValues, alphaValues, mValues, metric, dir);
   }
 
   // compute the cost of solution with respect points with this metric
